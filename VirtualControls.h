@@ -44,7 +44,7 @@ public:
 		caption.setFillColor(Color::Black);
 
 		setPosition(position);
-		setCaptionCharacterSize(13);
+		setCaptionCharacterSize(15);
 	}
 
 
@@ -152,7 +152,7 @@ public:
 
 		setSize(size);
 		setPosition(position);
-		setCaptionCharacterSize(12);
+		setCaptionCharacterSize(15);
 	}
 	
 
@@ -170,7 +170,7 @@ public:
 	}
 
 
-	void setSizeByCaption(Vector2f interval = Vector2f(10, 10))
+	void setSizeByCaption(Vector2f interval = Vector2f(5, 5))
 	{
 		setSize((caption.getLocalBounds().width - caption.getLocalBounds().left) + interval.x * 2,
 			(caption.getLocalBounds().height + caption.getLocalBounds().top) + interval.y * 2);
@@ -311,8 +311,8 @@ protected:
 	{
 		if (window)
 		{
-			float size_y = caption.getLocalBounds().height;
-			caption.setOrigin(-(size.x + 5), 0);
+			float size_y = caption.getLocalBounds().height - caption.getLocalBounds().top;
+			caption.setOrigin(-int(size.x + 5), int((size.y - size_y) / 2));
 		}
 		else
 			caption.setOrigin(-(size.x + 5), 0);
@@ -339,7 +339,7 @@ public:
 		setClickedColors();
 
 		background.setOutlineThickness(-1);
-		setCharacterSize(0);
+		setCharacterSize(15);
 
 		setSize(size);
 		setPosition(position);
@@ -555,8 +555,8 @@ protected:
 	{
 		if (window)
 		{
-			float size_y = caption.getLocalBounds().height;
-			caption.setOrigin(-(size.x + 5), 0);
+			float size_y = caption.getLocalBounds().height - caption.getLocalBounds().top;
+			caption.setOrigin(-int(size.x + 5), int((size.y - size_y) / 2));
 		}
 		else
 			caption.setOrigin(-(size.x + 5), 0);
@@ -576,7 +576,7 @@ public:
 		setClickedColors();
 
 		background.setOutlineThickness(-1);
-		setCharacterSize(0);
+		setCharacterSize(15);
 
 		setSize(size);
 		setPosition(position);
@@ -776,6 +776,12 @@ public:
 			}
 		}
 	}
+
+	void display() 
+	{
+		for (auto radio_button : radio_buttons)
+			radio_button->display();
+	}
 };
 
 class TextBox : 
@@ -806,11 +812,16 @@ protected:
 
 	void background_update()
 	{
+		wstring buf = text.getString().toWideString();
+		text.setString("Hello, World!");
 		window->draw(text);
+
 		int size_y = text.getLocalBounds().height + text.getLocalBounds().top;
-		
+
 		text.setOrigin(-int(size.y / 2 - size_y / 2), -int(size.y / 2 - size_y / 2));
 		text_cursor.setOrigin(-(size.y / 2 - size_y / 2), -(size.y / 2 - text_cursor.getSize().y / 2));
+
+		text.setString(buf);
 	}
 
 	void Brush(Color bg_color, Color txt_color, Color brd_color)
@@ -872,9 +883,10 @@ public:
 
 		setSize(size);
 		setPosition(position);
-		text.setCharacterSize(12);
+		text.setCharacterSize(15);
+		text.setPosition(0, 0);
 
-		text_cursor.setSize(Vector2f(2, 11*1.2));
+		text_cursor.setSize(Vector2f(2, 15*1.2));
 		text_cursor.setFillColor(Color::Black);
 
 		wordspace.setTexture(wordspace_render.getTexture(), true);
@@ -901,8 +913,14 @@ public:
 
 	void setSizeByCaption(Vector2f interval = Vector2f(5, 5))
 	{
+		wstring buf = text.getString().toWideString();
+		text.setString("Hello, World!");
+		window->draw(text);
+
 		setSize((text.getLocalBounds().width - text.getLocalBounds().left) + interval.x * 2,
 			(text.getLocalBounds().height + text.getLocalBounds().top) + interval.y * 2);
+
+		text.setString(buf);
 	}
 
 
@@ -947,12 +965,14 @@ public:
 	void setFont(Font &font)
 	{
 		text.setFont(font);
+
 		background_update();
 	}
 
 	void setCharacterSize(int size)
 	{
 		text.setCharacterSize(size);
+		text_cursor.setSize(Vector2f(2, size * 1.2));
 
 		background_update();
 	}
