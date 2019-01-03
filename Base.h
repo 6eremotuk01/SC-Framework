@@ -3,6 +3,8 @@
 #include <SFML\Graphics.hpp>
 #include <SFML\Audio.hpp>
 #include <iostream>
+#include <list>
+#include <Windows.h>
 
 using namespace sf;
 using namespace std;
@@ -280,6 +282,7 @@ public:
 	void setCaption(wstring text)
 	{
 		caption.setString(text);
+
 		caption_update();
 	}
 
@@ -356,19 +359,6 @@ public:
 	void setBorderSize(float size)
 	{
 		background.setOutlineThickness(size);
-		background_update();
-	}
-
-	void setBackgroundTexture(Texture &texture, bool resetRect = false)
-	{
-		background.setTexture(&texture, resetRect);
-		background_update();
-	}
-
-
-	void setBackgroundTextureRect(const IntRect &rect)
-	{
-		background.setTextureRect(rect);
 		background_update();
 	}
 

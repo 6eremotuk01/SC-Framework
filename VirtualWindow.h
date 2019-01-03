@@ -1044,7 +1044,8 @@ public:
 		checkbox.window_position = &workspace_position;
 
 		workspace_render.draw(checkbox.background);
-		if (checkbox.isChecked()) workspace_render.draw(checkbox.check);
+		if (checkbox.isChecked()) 
+			workspace_render.draw(checkbox.check);
 		workspace_render.draw(checkbox.caption);
 	}
 
@@ -1071,6 +1072,22 @@ public:
 		workspace_render.draw(textbox.wordspace);
 	}
 
+	void draw(ProgressBar &progressbar)
+	{
+		if (!is_open)
+		{
+			progressbar.window_position = NULL;
+			return;
+		}
+
+		if (!progressbar.isVisible())
+			return;
+
+		progressbar.window_position = &workspace_position;
+
+		workspace_render.draw(progressbar.background);
+		workspace_render.draw(progressbar.progressed);
+	}
 
 	void display()
 	{

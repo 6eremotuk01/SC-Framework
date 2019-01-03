@@ -7,9 +7,8 @@ using namespace std;
 
 /*
 	ToDo:
-		- –аботой с текстом (выделение копирование и вставка)
-		- —оздать класс ProgressBar (полоска прогресса, котора€ может быть прив€зана к значению)
-		- ƒобавить конструктор копировани€ (+ оператор =) дл€ каждого класса
+		- Combobox (выпадающее меню)
+		- ListBox (прокручиваемый листбокс)
 */
 
 void empty_method()
@@ -59,30 +58,6 @@ public:
 	{
 		setPosition(Vector2f(x, y));
 	}
-
-
-	int getEvent(sf::Event &event)
-	{
-		if (!is_enabled) return Event::Nothing;
-		
-		Vector2f mouse = window->mapPixelToCoords(Mouse::getPosition(*window));
-
-		if (ClickedOn(event, mouse))
-		{
-			onClick();
-			return Event::Clicked;
-		}
-
-		return Event::Nothing;
-	}
-
-	enum Event
-	{
-		Nothing = 0,
-		Clicked
-	};
-
-	void(*onClick)() = NULL;
 
 
 	void display()
@@ -278,6 +253,7 @@ public:
 
 
 	friend class VirtualWindow;
+	friend class ListBox;
 };
 
 class CheckBox : 
@@ -938,7 +914,7 @@ public:
 	}
 
 
-	void setBasicColors(Color bg_color = Color(255, 255, 255), Color txt_color = Color::Black,   Color brd_color = Color::Black)
+	void setBasicColors(Color bg_color = Color(255, 255, 255), Color txt_color = Color::Black, Color brd_color = Color::Black)
 	{
 		background_color.basic = bg_color;
 		text_color.basic = txt_color;
@@ -1144,6 +1120,110 @@ public:
 
 		window->draw(background);
 		window->draw(wordspace);
+	}
+
+	friend class VirtualWindow;
+};
+
+class ProgressBar:
+	public Enable,
+	public Click,
+	public Visible,
+	public Background,
+	public VirtualWindowElement
+{
+protected:
+	RectangleShape progressed;
+	int value = 0;
+	int one_progress_step = 0;
+
+	Color background_color,
+		border_color,
+		progressed_color;
+
+	void Brush(Color bg_color, Color prg_color, Color brd_color)
+	{
+		background.setFillColor(bg_color);
+		progressed.setFillColor(prg_color);
+		background.setOutlineColor(brd_color);
+	}
+
+	void background_update() 
+	{
+		one_progress_step = size.x / 100;
+		progressed.setSize(Vector2f(one_progress_step * value, size.y));
+	}
+
+public:
+
+	ProgressBar(RenderWindow &window)
+	{
+		this->window = &window;
+
+		setSize(100, 20);
+		setPosition(0, 0);
+
+		setBasicColors();
+	}
+	
+
+	void setSize(Vector2f size)
+	{
+		this->size = size;
+
+		background.setSize(size);
+		
+		background_update();
+	}
+
+	void setSize(float x, float y)
+	{
+		setSize(Vector2f(x, y));
+	}
+
+
+	void setBasicColors(Color bg_color = Color(225, 225, 225), Color prg_color = Color::Green, Color brd_color = Color::Black)
+	{
+		Brush(bg_color, prg_color, brd_color);
+	}
+
+
+	void setPosition(Vector2f position)
+	{
+		this->position = position;
+		
+		background.setPosition(position);
+		progressed.setPosition(position);
+
+		background_update();
+	}
+
+	void setPosition(float x, float y)
+	{
+		setPosition(Vector2f(x, y));
+	}
+
+
+	void setValue(int value)
+	{
+		this->value = value;
+
+		background_update();
+	}
+
+	int getValue()
+	{
+		return this->value;
+	}
+
+
+	void display()
+	{
+		if (!is_visible)
+			return;
+
+		window->draw(background);
+		window->draw(progressed);
 	}
 
 	friend class VirtualWindow;
