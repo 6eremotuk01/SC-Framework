@@ -2,16 +2,68 @@
 SimpleControl Framework - фреймворк, содержащий в себе базовые элементы управления приложением. Фреймворк основан на библиотеке SFML, языка С++.
 
 ## Установка
-Для работы библиотеки необходимо наличие в проекте установленной, вышеупомянутой, библиотеки SFML. Инструкция по установки библиотеки [здесь](https://www.sfml-dev.org/tutorials/2.5/start-vc.php). Подключение осуществляется через заголовок файла:
+Для работы библиотеки необходимо наличие в проекте установленной, вышеупомянутой, библиотеки SFML. Инструкция по установки библиотеки [здесь](https://www.sfml-dev.org/tutorials/2.5/start-vc.php).
+
+## Начало работы
+
+Подключение осуществляется через заголовок файла: `#include "VirtualControls";`. Далее создайте следующую структуру:
+
 ```c++
-#include "VirtualControls";
+#include "VirtualControls.h"
+
+using namespace sf;
+
+/*Создание окна*/
+RenderWindow window(VideoMode(400, 300), "Testing", Style::Default);
+
+/*Создание объектов*/
+Font font;
+...
+Label label(window, font);
+
+/*Инициализация компонентов*/
+void InitializeComponents()
+{
+	/* Зашрузка шрифта */
+   	font.loadFromFile("Consolas.ttf");
+
+	/* Установка свойств для объектов*/
+	label.setCaption("Hello, world!");
+	...
+	Label.setPosition(10, 10);
+}
+
+/*Стандартный SFML цикл*/
+int main()
+{
+    InitializeComponents();
+
+    while (window.isOpen())
+    {
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == Event::Closed)
+                window.close();
+        }
+
+        window.clear(Color::Magenta);
+        label.display(); // Выводит надпись
+        window.display();
+    }
+}
 ```
+Данная структура самая оптимальная для использования фреймвока. Глобализация компонентов необходима для более легкой видимости. К примеру, это пригодится при установки событийных методов или процедур.
+
+## Методы
+
+*Comming soon...*
+
 ## Пример использования
 
 Ниже представлен простой код счетчика нажатий.
 
 ```c++
-#include "VirtualWindow.h"
 #include "VirtualControls.h"
 
 using namespace sf;
