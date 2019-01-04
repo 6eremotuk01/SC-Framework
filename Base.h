@@ -1,7 +1,6 @@
 #pragma once
 
 #include <SFML\Graphics.hpp>
-#include <SFML\Audio.hpp>
 #include <iostream>
 #include <list>
 #include <Windows.h>
@@ -11,66 +10,6 @@ using namespace std;
 
 
 #define Watch(param) cout << #param << " = " << param << endl;
-
-
-string getCoordString(Vector2f coord, string description)
-{
-	string result = description + " ";
-
-	result += to_string(coord.x);
-	result += ", ";
-	result += to_string(coord.y);
-
-	return result;
-}
-
-string getCoordString(Vector2f coord)
-{
-	string result;
-
-	result += to_string(coord.x);
-	result += ", ";
-	result += to_string(coord.y);
-
-	return result;
-}
-
-
-bool isSpecialSymbol(char symbol)
-{
-	if (symbol == '.') return true;
-	else if (symbol == ' ') return true;
-	else if (symbol == ',') return true;
-	else if (symbol == '(') return true;
-	else if (symbol == ')') return true;
-	else if (symbol == '-') return true;
-	else if (symbol == '+') return true;
-	else if (symbol == '=') return true;
-	else if (symbol == '{') return true;
-	else if (symbol == '}') return true;
-	else if (symbol == '/') return true;
-	else if (symbol == '|') return true;
-	else if (symbol == ':') return true;
-	else if (symbol == ';') return true;
-	else if (symbol == '@') return true;
-	else if (symbol == '#') return true;
-	else if (symbol == '¹') return true;
-	else if (symbol == '$') return true;
-	else if (symbol == '%') return true;
-	else if (symbol == '^') return true;
-	else if (symbol == '&') return true;
-	else if (symbol == '?') return true;
-	else if (symbol == '!') return true;
-	else if (symbol == '*') return true;
-	else if (symbol == '<') return true;
-	else if (symbol == '>') return true;
-	else if (symbol == '\"') return true;
-	else if (symbol == '\'') return true;
-	else if (symbol == '\\') return true;
-
-	return false;
-}
-
 
 class Position
 {
@@ -222,6 +161,8 @@ public:
 	{
 		this->is_checked = is_checked;
 	}
+
+	friend class RadioButtonContainer;
 };
 
 
@@ -252,7 +193,7 @@ public:
 	}
 };
 
-class VirtualWindowElement
+class RenderWindowElement
 {
 protected:
 	RenderWindow* window;

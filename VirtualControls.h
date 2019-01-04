@@ -5,24 +5,13 @@
 using namespace sf;
 using namespace std;
 
-/*
-	ToDo:
-		- Combobox (выпадающее меню)
-		- ListBox (прокручиваемый листбокс)
-*/
-
-void empty_method()
-{
-	cout << "Method is empty!" << endl;
-}
-
 
 class Label : 
 	public Enable, 
 	public Visible, 
 	public Caption, 
 	public Click,
-	public VirtualWindowElement
+	public RenderWindowElement
 {
 protected:
 	bool click_in = false;
@@ -77,7 +66,7 @@ class CaptionButton :
 	public Visible, 
 	public Caption, 
 	public Background,
-	public VirtualWindowElement
+	public RenderWindowElement
 {
 protected:
 	ActiveColor background_color,
@@ -208,6 +197,16 @@ public:
 	}
 
 
+	void display()
+	{
+		if (!is_visible)
+			return;
+
+		window->draw(background);
+		window->draw(caption);
+	}
+
+
 	int getEvent(sf::Event &event)
 	{
 		if (!is_enabled) 
@@ -222,7 +221,7 @@ public:
 
 		if (ClickedOn(event, mouse))
 		{
-			onClick();
+			if (onClick) onClick();
 			return Event::Clicked;
 		}
 		
@@ -239,21 +238,9 @@ public:
 		Clicked
 	};
 
-	void(*onClick)() = &empty_method;
-
-
-	void display()
-	{
-		if (!is_visible)
-			return;
-
-		window->draw(background);
-		window->draw(caption);
-	}
-
-
-	friend class VirtualWindow;
-	friend class ListBox;
+	void(*onClick)() = NULL;
+	void(*onHover)() = NULL;
+	void(*onHoverOut)() = NULL;
 };
 
 class CheckBox : 
@@ -262,7 +249,7 @@ class CheckBox :
 	public Visible, 
 	public Caption, 
 	public Background,
-	public VirtualWindowElement
+	public RenderWindowElement
 {
 protected:
 	VertexArray check;
@@ -428,9 +415,31 @@ public:
 	}
 
 
+	bool isChecked()
+	{
+		return checked;
+	}
+
+	void setState(bool checked)
+	{
+		this->checked = checked;
+	}
+
+
 	void setIndentationImg(int indentation)
 	{
 		this->indentation = indentation;
+	}
+
+
+	void display()
+	{
+		if (!is_visible)
+			return;
+
+		window->draw(background);
+		if (checked) window->draw(check);
+		window->draw(caption);
 	}
 
 
@@ -441,21 +450,27 @@ public:
 		Vector2f mouse = window->mapPixelToCoords(Mouse::getPosition(*window));
 
 		if (isIn(Mouse::getPosition(*window)))
+		{
+			if (onHover) onHover();
 			Brush(background_color.hovered, text_color.hovered, border_color.hovered, check_color.hovered);
+		}
 		else
+		{
+			if (onHoverOut) onHoverOut();
 			Brush(background_color.basic, text_color.basic, border_color.basic, check_color.basic);
+		}
 
 		if (ClickedOn(event, mouse))
 		{
 			checked = !checked;
 			if (checked)
 			{
-				onChecked();
+				if (onChecked) onChecked();
 				return Event::Checked;
 			}
 			else 
 			{
-				onUnchecked();
+				if (onUnchecked) onUnchecked();
 				return Event::Unchecked;
 			}
 		}
@@ -473,31 +488,10 @@ public:
 		Unchecked
 	};
 
-	void(*onChecked)() = &empty_method;
-	void(*onUnchecked)() = &empty_method;
-
-	bool isChecked()
-	{
-		return checked;
-	}
-
-	void setState(bool checked)
-	{
-		this->checked = checked;
-	}
-
-
-	void display()
-	{
-		if (!is_visible)
-			return;
-
-		window->draw(background);
-		if (checked) window->draw(check);
-		window->draw(caption);
-	}
-
-	friend class VirtualWindow;
+	void(*onChecked)()	= NULL;
+	void(*onUnchecked)() = NULL;
+	void(*onHover)() = NULL;
+	void(*onHoverOut)() = NULL;
 };
 
 class RadioButton : 
@@ -506,7 +500,7 @@ class RadioButton :
 	public Visible, 
 	public Caption, 
 	public Checked,
-	public VirtualWindowElement
+	public RenderWindowElement
 {
 protected:
 	CircleShape background, 
@@ -669,50 +663,6 @@ public:
 		this->indentation = indentation;
 	}
 
-
-	int getEvent(sf::Event &event)
-	{
-		if (!is_enabled) return Event::Nothing;
-
-		Vector2f mouse = window->mapPixelToCoords(Mouse::getPosition(*window));
-
-		if (isIn(Mouse::getPosition(*window)))
-			Brush(background_color.hovered, text_color.hovered, border_color.hovered, check_color.hovered);
-		else
-			Brush(background_color.basic, text_color.basic, border_color.basic, check_color.basic);
-
-		if (ClickedOn(event, mouse))
-		{
-			if (!is_checked)
-			{
-				onChecked();
-
-				is_checked = true;
-				return Event::Checked;
-			}
-			else
-			{
-				onUnchecked();
-				return Event::Unchecked;
-			}
-		}
-
-		if (click_in)
-			Brush(background_color.clicked, text_color.clicked, border_color.clicked, check_color.clicked);
-
-		return Event::Nothing;
-	}
-
-	enum Event
-	{
-		Nothing = 0,
-		Checked,
-		Unchecked
-	};
-
-	void(*onChecked)() = &empty_method;
-	void(*onUnchecked)() = &empty_method;
-
 	void display()
 	{
 		if (!is_visible)
@@ -724,8 +674,56 @@ public:
 	}
 
 
-	friend class VirtualWindow;
-	friend class RadioButtonContainer;
+	int getEvent(sf::Event &event)
+	{
+		if (!is_enabled) return Event::Nothing;
+
+		Vector2f mouse = window->mapPixelToCoords(Mouse::getPosition(*window));
+
+		if (isIn(Mouse::getPosition(*window)))
+		{
+			if (onHover) onHover();
+			Brush(background_color.hovered, text_color.hovered, border_color.hovered, check_color.hovered);
+		}
+		else
+		{
+			if (onHoverOut) onHoverOut();
+			Brush(background_color.basic, text_color.basic, border_color.basic, check_color.basic);
+		}
+
+		if (ClickedOn(event, mouse))
+		{
+			if (!is_checked)
+			{
+				if (onChecked) onChecked();
+
+				is_checked = true;
+				return Event::Checked;
+			}
+			else
+			{
+				if (onUnchecked) onUnchecked();
+				return Event::Unchecked;
+			}
+		}
+
+		if (click_in)
+			Brush(background_color.clicked, text_color.clicked, border_color.clicked, check_color.clicked);
+
+		return Event::Nothing;
+	}
+	
+	enum Event
+	{
+		Nothing = 0,
+		Checked,
+		Unchecked
+	};
+
+	void(*onChecked)() = NULL;
+	void(*onUnchecked)() = NULL;
+	void(*onHover)() = NULL;
+	void(*onHoverOut)() = NULL;
 }; 
 
 class RadioButtonContainer
@@ -765,7 +763,7 @@ class TextBox :
 	public Click, 
 	public Visible, 
 	public Background,
-	public VirtualWindowElement
+	public RenderWindowElement
 {
 protected:
 	RenderTexture wordspace_render;
@@ -976,15 +974,38 @@ public:
 		return text.getString();
 	}
 
+	void display()
+	{		
+		if (!is_visible)
+			return;
+		
+		update();
+
+		wordspace_render.clear(Color::Transparent);
+		wordspace_render.draw(text);
+		if ((int)frames % 2 != 0 && is_typing) 
+			wordspace_render.draw(text_cursor);
+		wordspace_render.display();
+
+		window->draw(background);
+		window->draw(wordspace);
+	}
+
 
 	int getEvent(sf::Event &event)
 	{
 		Vector2f mouse = window->mapPixelToCoords(Mouse::getPosition(*window));
 
-		if (isIn(Mouse::getPosition(*window)))
+		if (isIn(Mouse::getPosition(*window))) 
+		{
+			if (onHover) onHover();
 			Brush(background_color.hovered, text_color.hovered, border_color.hovered);
-		else
+		}
+		else 
+		{
+			if (onHoverOut) onHoverOut();
 			Brush(background_color.basic, text_color.basic, border_color.basic);
+		}
 			
 		if (is_typing)
 		{
@@ -1021,6 +1042,8 @@ public:
 					break;
 				}
 				frames = 1;
+
+				if (onTextChanged) onTextChanged();
 			}
 
 			if (event.type == sf::Event::KeyPressed && event.key.code == Keyboard::Left)
@@ -1068,14 +1091,14 @@ public:
 
 			if (event.type == sf::Event::KeyReleased && event.key.code == Keyboard::Return)
 			{
-				onReturned();
+				if (onReturned) onReturned();
 				return Event::Returned;
 			}
 		}
 
 		if (ClickedOn(event, mouse))
 		{
-			onClick();
+			if (onClick) onClick();
 
 			is_typing = true;
 			frames = 1;
@@ -1101,28 +1124,11 @@ public:
 		Returned
 	};
 
-	void(*onClick)() = &empty_method;
-	void(*onReturned)() = &empty_method;
-	
-
-	void display()
-	{		
-		if (!is_visible)
-			return;
-		
-		update();
-
-		wordspace_render.clear(Color::Transparent);
-		wordspace_render.draw(text);
-		if ((int)frames % 2 != 0 && is_typing) 
-			wordspace_render.draw(text_cursor);
-		wordspace_render.display();
-
-		window->draw(background);
-		window->draw(wordspace);
-	}
-
-	friend class VirtualWindow;
+	void(*onClick)() = NULL;
+	void(*onHover)() = NULL;
+	void(*onHoverOut)() = NULL;
+	void(*onReturned)() = NULL;
+	void(*onTextChanged)() = NULL;
 };
 
 class ProgressBar:
@@ -1130,7 +1136,7 @@ class ProgressBar:
 	public Click,
 	public Visible,
 	public Background,
-	public VirtualWindowElement
+	public RenderWindowElement
 {
 protected:
 	RectangleShape progressed;
@@ -1206,6 +1212,9 @@ public:
 
 	void setValue(int value)
 	{
+		if (value > 100) value = 100;
+		if (value < 0) value = 0;
+
 		this->value = value;
 
 		background_update();
