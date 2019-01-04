@@ -23,8 +23,9 @@ protected:
 
 public:
 
-	Label(RenderWindow &window)
+	Label(RenderWindow &window, Font &font)
 	{
+		setCaptionFont(font);
 		this->window = &window;
 
 		position = Vector2f(0, 0);
@@ -102,9 +103,10 @@ protected:
 
 public:
 
-	CaptionButton(RenderWindow &window)
+	CaptionButton(RenderWindow &window, Font &font)
 	{
 		this->window = &window;
+		setCaptionFont(font);
 
 		size = Vector2f(75, 35);
 		position = Vector2f(0, 0);
@@ -133,13 +135,29 @@ public:
 		setSize(Vector2f(x, y));
 	}
 
+	
+	void setCaption(wstring text, bool size = false)
+	{
+		caption.setString(text);
+
+		if (size)
+			setSizeByCaption();
+	}
+
+	void setCaption(string text, bool size = false)
+	{
+		caption.setString(text);
+
+		if (size)
+			setSizeByCaption();
+	}
+
 
 	void setSizeByCaption(Vector2f interval = Vector2f(5, 5))
 	{
 		setSize((caption.getLocalBounds().width - caption.getLocalBounds().left) + interval.x * 2,
 			(caption.getLocalBounds().height + caption.getLocalBounds().top) + interval.y * 2);
 		caption_update();
-		setPosition(position);
 	}
 
 
@@ -288,8 +306,9 @@ protected:
 
 public:
 
-	CheckBox(RenderWindow &window)
+	CheckBox(RenderWindow &window, Font &font)
 	{
+		setCaptionFont(font);
 		this->window = &window;
 		checked = false;
 
@@ -533,8 +552,9 @@ protected:
 	}
 
 public:
-	RadioButton(RenderWindow &window)
+	RadioButton(RenderWindow &window, Font &font)
 	{
+		setCaptionFont(font);
 		this->window = &window;
 		is_checked = false;
 
@@ -843,8 +863,9 @@ protected:
 	}
 
 public:
-	TextBox(RenderWindow &window)
+	TextBox(RenderWindow &window, Font &font)
 	{
+		setFont(font);
 		this->window = &window;
 		
 		size = Vector2f(75, 25);
@@ -952,18 +973,24 @@ public:
 	}
 
 
-	void setText(string text)
+	void setText(string text, bool size = false)
 	{
 		this->text.setString(text);
 		this->result_text = wstring(text.begin(), text.end());
 
+		if (size)
+			setSizeByCaption();
+
 		background_update();
 	}
 
-	void setText(wstring text)
+	void setText(wstring text, bool size = false)
 	{
 		this->text.setString(text);
 		this->result_text = text;
+
+		if (size)
+			setSizeByCaption();
 
 		background_update();
 	}

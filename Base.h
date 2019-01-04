@@ -32,17 +32,6 @@ public:
 	{
 		return this->position;
 	}
-
-
-	virtual void setPositionLimit(float x, float y)
-	{
-		position_limit = Vector2f(x, y);
-	}
-
-	virtual Vector2f getPositionLimit()
-	{
-		return position_limit;
-	}
 };
 
 class Size
@@ -216,9 +205,8 @@ class Caption
 protected:
 	Text caption;
 
-	virtual void caption_update() = 0;
-
 public:
+	virtual void caption_update() = 0;
 
 	void setCaption(wstring text)
 	{
