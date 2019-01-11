@@ -109,6 +109,8 @@ int main()
 | `void setSize(float width, float height)` | Установка размера элемента. Параметры: *width* - ширина элемента; *height* - высота элемента. |
 | `void setWindow(sf::RenderWindow window)` | Установка целевого окна элемента. Но стоит обратить внимание, что конструктор по умолчанию требует указать. Параметры: *window* - целевое окно. |
 
+Данный элемент не имеет событийных процедур, а соответственно и событий.
+
 #### CaptionButton
 
 Предназначен для создания кнопки с надписью и привязки процедур к ней.
@@ -152,21 +154,133 @@ int main()
 | `void(*onHover)() = NULL` | Указатель на процедуру, которая будет вызвана при наведении на кнопку.  |
 | `void(*onHoverOut)() = NULL` | Указатель на процедуру, которая будет вызвана при выводе курсора за границы кнопки.  |
 
-События пренадлежащие CaptionButton.
+События пренадлежащие CaptionButton (`enum Event`).
 
 | Наименование | Событие |
 |:-|:-|
-| Nothing | Никакого события не произошло |
-| Clicked | Кнопка была нажата |
+| `CaptionButton::Event::Nothing` | Никакого события не произошло |
+| `CaptionButton::Event::Clicked` | Кнопка была нажата |
 
 #### CheckBox
-*Comming soon...*
+Предназначен для создания переключателя, имеющего два состояния `Checked` и `Unchecked`.
+
+| Метод | Описание |
+|:-|:-|
+| `Label(RenderWindow &window, &font)` | Конструктор элемента. Параметры: *window* - окно, в котором будет отображаться элемент; *font* - шрфит надписи. |
+| `void display()` | Рисование элемента в целевом окне (для изменения окна используйте `setWindow(sf::RenderWindow window)`, но стоит обратить внимание, что конструктор по умолчанию требует указать целевое окно).|
+| `sf::String getCaption()` | Возвращает надпись. |
+| `int getCaptionCharacterSize()` | Возвращает размер шрифта. |
+| `float getCaptionOutlineThickness()` | Возвращает толщину обводки шрифта. |
+| `sf::Font getFont()` | Возвращает указатель на шрифт. Возвращает NULL, если шрифта нет. |
+| `sf::Vector2f getPosition()` | Возвращает позицию элемента. |
+| `sf::Vector2f getSize()` | Возвращает размер элемента. |
+| `sf::RenderWindow getWindow()` | Возвращает указатель на окно. Возвращает NULL, если шрифта нет. |
+| `bool isEnabled()` | Возвращает true, если элемент активен. false, если нет. |
+| `bool isChecked()` | Возвращает true, если у элемента стоит галочка. false, если нет. |
+| `bool label.isVisible();` | Возвращает true, если элемент виден. false, если нет. |
+| `void setCaption(wstring text, Vector2f identication)` | Устанавливает текст надписи. Параметры: *text* - текст надписи или массив символов. *identication* - если установлен, то после изменения надписи будет вызван метод `void setSizeByCaption(identication)` |
+| `void setCaption(string text, Vector2f identication)` | Устанавливает текст надписи. Параметры: *text* - текст надписи или массив символов. *identication* - если установлен, то после изменения надписи будет вызван метод `void setSizeByCaption(identication)` |
+| `void setCaptionCharacterSize(int size)` | Устанавливает размер шрифта надписи. Параметры: *size* - размер в пикселях. |
+| `void setCaptionColor(sf::Color color)` | Устанавливает цвет шрифта надписи. Параметры: *color* - цвет надписи. |
+| `void setCaptionFont(sf::Font font)` | Устанавливает шрифт надписи. Но стоит обратить внимание, что конструктор по умолчанию требует указать шрифт. Параметры: *font* - указатель на шрифт. |
+| `void setCaptionOutlineThickness(int size)` | Устанавливает размер обводки шрифта надписи. Параметры: *size* - размер в пикселях. если указать отрицательное значение, то обводка станет внутреней. |
+| `void setCaptionStyle(sf::Uint32 style)` | Устанавливает стиль шрфита надписи. Параметры: *style* - сочетание стилей (стиля). |
+| `void setEnability(bool enability)` | Установка активности элемента. Параметры: *enability* - активность элемента. |
+| `void setVisibility(bool visibility)` | Установка видимости элемента. Параметры: *visibility* - видимость элемента. |
+| `void setPosition(sf::Vector2f position)` | Установка позиции элемента. Параметры: *position* - позиция элемента. |
+| `void setPosition(float x, float y)` | Установка позиции элемента. Параметры: *x* - позиция элемента по оси X; *x* - позиция элемента по оси Y. |
+| `void setSize(sf::Vector2f size)` | Установка размера элемента. Параметры: *size* - размер элемента; |
+| `void setSize(float width, float height)` | Установка размера элемента. Параметры: *width* - ширина элемента; *height* - высота элемента. |
+| `void setWindow(sf::RenderWindow window)` | Установка целевого окна элемента. Но стоит обратить внимание, что конструктор по умолчанию требует указать. Параметры: *window* - целевое окно. |
+| `void setIndentationImg(int indentation)` | Устанавливает отступ между началом галочки и границей поля для нее. Параметры: *indentation* - размер отступа. |
+| `void setBackgroundColors(ActiveColor colors = ActiveColor(Color(225, 225, 225), Color(245, 245, 245), Color(190, 190, 190)))` | Устанавливает цвета тела переключателя. Параметры: *colors* - активные цвета тела переключателя. |
+| `void setBorderColors(ActiveColor colors = ActiveColor(Color(225, 225, 225), Color(245, 245, 245), Color(190, 190, 190)))` | Устанавливает цвета рамки переключателя. Параметры: *colors* - активные цвета рамки переключателя. |
+| `void setTextColors(ActiveColor colors = ActiveColor(Color(225, 225, 225), Color(245, 245, 245), Color(190, 190, 190)))` | Устанавливает цвета текста переключателя. Параметры: *colors* - активные цвета текста переключателя. |
+| `void setCheckColors(ActiveColor colors = ActiveColor(Color::Black, Color::Black, Color::Black))` | Устанавливает цвета галочки переключателя. Параметры: *colors* - активные цвета текста переключателя. |
+| `void setState(bool checked)` | Устанавливает состояние переключателя. Параметры: *checked* - true соответсвует `Checked`, false - `Unchecked`. |
+| `ActiveColor getBackgroundColors()` | Возвращает цвета тела переключателя. |
+| `ActiveColor getBorderColors()` | Возвращает цвета рамки переключателя. |
+| `ActiveColor getTextColors()` | Возвращает цвета текста переключателя. |
+| `ActiveColor getCheckColors()` | Возвращает цвета галочки переключателя. |
+| `int getEvent(sf::Event &event)` | Обрабатывает события для переключателя. Возвращает код события `enum Event`. Параметры: *event* - событийный объект. |
+| `void(*onChecked)() = NULL` | Указатель на процедуру, которая будет вызвана при переключении элемента в `Checked`. |
+| `void(*onChecked)() = NULL` | Указатель на процедуру, которая будет вызвана при переключении элемента в `Unchecked`. |
+| `void(*onUnchecked)() = NULL`| Указатель на процедуру, которая будет вызвана при наведении на элемент.|
+| `void(*onHoverOut)() = NULL` | Указатель на процедуру, которая будет вызвана при выводе курсора за границы элемента.  |
+| `void(*onHover)() = NULL` | Указатель на процедуру, которая будет вызвана при наведении на элемент.  |
+
+События пренадлежащие CheckBox (`enum Event`).
+
+| Наименование | Событие |
+|:-|:-|
+| `CheckBox::Event::Nothing` | Никакого события не произошло |
+| `CheckBox::Event::Checked` | Элемент переключен в состояние `Checked` |
+| `CheckBox::Event::Unchecked` | Элемент переключен в состояние `Unchecked` |
 
 #### RadioButton
-*Comming soon...*
+Элемент схож с CheckBox (предназначен для создания переключателя, имеющего два состояния `Checked` и `Unchecked`), но зависит от других элементов, находящихся в контенере `RadioButtonContainer`. А именно только один переключатель может быть включен в данном контейнере.
+
+| Метод | Описание |
+|:-|:-|
+| `Label(RenderWindow &window, &font)` | Конструктор элемента. Параметры: *window* - окно, в котором будет отображаться элемент; *font* - шрфит надписи. |
+| `void display()` | Рисование элемента в целевом окне (для изменения окна используйте `setWindow(sf::RenderWindow window)`, но стоит обратить внимание, что конструктор по умолчанию требует указать целевое окно).|
+| `sf::String getCaption()` | Возвращает надпись. |
+| `int getCaptionCharacterSize()` | Возвращает размер шрифта. |
+| `float getCaptionOutlineThickness()` | Возвращает толщину обводки шрифта. |
+| `sf::Font getFont()` | Возвращает указатель на шрифт. Возвращает NULL, если шрифта нет. |
+| `sf::Vector2f getPosition()` | Возвращает позицию элемента. |
+| `sf::Vector2f getSize()` | Возвращает размер элемента. |
+| `sf::RenderWindow getWindow()` | Возвращает указатель на окно. Возвращает NULL, если шрифта нет. |
+| `bool isEnabled()` | Возвращает true, если элемент активен. false, если нет. |
+| `bool isChecked()` | Возвращает true, если у элемента стоит галочка. false, если нет. |
+| `bool label.isVisible();` | Возвращает true, если элемент виден. false, если нет. |
+| `void setCaption(wstring text, Vector2f identication)` | Устанавливает текст надписи. Параметры: *text* - текст надписи или массив символов. *identication* - если установлен, то после изменения надписи будет вызван метод `void setSizeByCaption(identication)` |
+| `void setCaption(string text, Vector2f identication)` | Устанавливает текст надписи. Параметры: *text* - текст надписи или массив символов. *identication* - если установлен, то после изменения надписи будет вызван метод `void setSizeByCaption(identication)` |
+| `void setCaptionCharacterSize(int size)` | Устанавливает размер шрифта надписи. Параметры: *size* - размер в пикселях. |
+| `void setCaptionColor(sf::Color color)` | Устанавливает цвет шрифта надписи. Параметры: *color* - цвет надписи. |
+| `void setCaptionFont(sf::Font font)` | Устанавливает шрифт надписи. Но стоит обратить внимание, что конструктор по умолчанию требует указать шрифт. Параметры: *font* - указатель на шрифт. |
+| `void setCaptionOutlineThickness(int size)` | Устанавливает размер обводки шрифта надписи. Параметры: *size* - размер в пикселях. если указать отрицательное значение, то обводка станет внутреней. |
+| `void setCaptionStyle(sf::Uint32 style)` | Устанавливает стиль шрфита надписи. Параметры: *style* - сочетание стилей (стиля). |
+| `void setEnability(bool enability)` | Установка активности элемента. Параметры: *enability* - активность элемента. |
+| `void setVisibility(bool visibility)` | Установка видимости элемента. Параметры: *visibility* - видимость элемента. |
+| `void setPosition(sf::Vector2f position)` | Установка позиции элемента. Параметры: *position* - позиция элемента. |
+| `void setPosition(float x, float y)` | Установка позиции элемента. Параметры: *x* - позиция элемента по оси X; *x* - позиция элемента по оси Y. |
+| `void setSize(sf::Vector2f size)` | Установка размера элемента. Параметры: *size* - размер элемента; |
+| `void setSize(float width, float height)` | Установка размера элемента. Параметры: *width* - ширина элемента; *height* - высота элемента. |
+| `void setWindow(sf::RenderWindow window)` | Установка целевого окна элемента. Но стоит обратить внимание, что конструктор по умолчанию требует указать. Параметры: *window* - целевое окно. |
+| `void setIndentationImg(int indentation)` | Устанавливает отступ между началом галочки и границей поля для нее. Параметры: *indentation* - размер отступа. |
+| `void setBackgroundColors(ActiveColor colors = ActiveColor(Color(225, 225, 225), Color(245, 245, 245), Color(190, 190, 190)))` | Устанавливает цвета тела переключателя. Параметры: *colors* - активные цвета тела переключателя. |
+| `void setBorderColors(ActiveColor colors = ActiveColor(Color(225, 225, 225), Color(245, 245, 245), Color(190, 190, 190)))` | Устанавливает цвета рамки переключателя. Параметры: *colors* - активные цвета рамки переключателя. |
+| `void setTextColors(ActiveColor colors = ActiveColor(Color(225, 225, 225), Color(245, 245, 245), Color(190, 190, 190)))` | Устанавливает цвета текста переключателя. Параметры: *colors* - активные цвета текста переключателя. |
+| `void setCheckColors(ActiveColor colors = ActiveColor(Color::Black, Color::Black, Color::Black))` | Устанавливает цвета галочки переключателя. Параметры: *colors* - активные цвета текста переключателя. |
+| `void setState(bool checked)` | Устанавливает состояние переключателя. Параметры: *checked* - true соответсвует `Checked`, false - `Unchecked`. |
+| `ActiveColor getBackgroundColors()` | Возвращает цвета тела переключателя. |
+| `ActiveColor getBorderColors()` | Возвращает цвета рамки переключателя. |
+| `ActiveColor getTextColors()` | Возвращает цвета текста переключателя. |
+| `ActiveColor getCheckColors()` | Возвращает цвета галочки переключателя. |
+| `int getEvent(sf::Event &event)` | Обрабатывает события для переключателя. Возвращает код события `enum Event`. Параметры: *event* - событийный объект. |
+| `void(*onChecked)() = NULL` | Указатель на процедуру, которая будет вызвана при переключении элемента в `Checked`. |
+| `void(*onChecked)() = NULL` | Указатель на процедуру, которая будет вызвана при переключении элемента в `Unchecked`. |
+| `void(*onUnchecked)() = NULL`| Указатель на процедуру, которая будет вызвана при наведении на элемент.|
+| `void(*onHoverOut)() = NULL` | Указатель на процедуру, которая будет вызвана при выводе курсора за границы элемента.  |
+| `void(*onHover)() = NULL` | Указатель на процедуру, которая будет вызвана при наведении на элемент.  |
+
+События пренадлежащие RadioButton (`enum Event`).
+
+| Наименование | Событие |
+|:-|:-|
+| `RadioButton::Event::Nothing` | Никакого события не произошло |
+| `RadioButton::Event::Checked` | Элемент переключен в состояние `Checked` |
+| `RadioButton::Event::Unchecked` | Элемент переключен в состояние `Unchecked` |
 
 #### RadioButtonContainer
-*Comming soon...*
+Указатель на элементы `RadioButton`, которые должны быть связаны между собой. Обеспечевает ограничение по включенным элементам (из всех добавленных только один элемент может находится в состоянии `Checked`, остальные - `Unchecked`).
+
+| Метод | Описание |
+|:-|:-|
+| `void add(RadioButton &radio_button)` | Метод предназначен для добавления элемента `RadioButton` в контейнер. Параметры: *radio_button* - элемент `RadioButton`. |
+| `void events(sf::Event &event)` | Обработка событий контейнера (в отличие от других элементов, не возвращает код события).  Параметры: *event* - событийный объект. |
+| `void display()` | Рисование всех добавленных элементов в контейнер. Прорисовка элементов происходит в тех окнах, которые указаны у элементов `RadioButton`. |
 
 #### TextBox
 *Comming soon...*
