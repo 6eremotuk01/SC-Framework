@@ -59,12 +59,26 @@ int main()
 
 Фремворк имеет следующие компоненты:
 1. Label - простая надпись
-2. CaptionButton - кнопка с надпиьсю
+2. CaptionButton - кнопка с надписью
 3. CheckBox - переключатель с галочкой
 4. RadioButton - переключатель между элементами
 5. RadioButtonContainer - контейнер для переключателей RadioButton
 6. TextBox - поле ввода текста
 7. ProgressBar - полоса прогресса
+
+Также присутствуют базовые классы:
+* Position - позиция элемента
+* Size - рзамер элемента
+* IsIn - класс, используемый для определния вхождения точки в размере элемента
+* isEnabled - активность элемента
+* Open - открытость элемента
+* Visible - видимость элемента
+* Checked - "включенность" элемента
+* ActiveColor - цвета активности элемента
+* RenderWindowElement - указатель на окно для элемента
+* Caption - надпись элемента
+* Background - задний фон или тело элемента
+* Click - класс, используемый для определния нажатия на элемент
 
 #### Label
 Предназначен для вывода текста.
@@ -80,10 +94,40 @@ int main()
 | `sf::Vector2f getPosition()` | Возвращает позицию элемента. |
 | `sf::Vector2f getSize()` | Возвращает размер элемента. |
 | `sf::RenderWindow getWindow()` | Возвращает указатель на окно. Возвращает NULL, если шрифта нет. |
+| `bool label.isVisible();` | Возвращает true, если элемент виден. false, если нет. |
+| `void setCaption(std::string text)` | Устанавливает текст надписи. Параметры: *text* - текст надписи или массив символов. |
+| `void setCaption(std::wstring text)` | Устанавливает текст надписи. Параметры: *text* - текст надписи или массив символов. |
+| `void setCaptionCharacterSize(int size)` | Устанавливает размер шрифта надписи. Параметры: *size* - размер в пикселях. |
+| `void setCaptionColor(sf::Color color)` | Устанавливает цвет шрифта надписи. Параметры: *color* - цвет надписи. |
+| `void setCaptionFont(sf::Font font)` | Устанавливает шрифт надписи. Но стоит обратить внимание, что конструктор по умолчанию требует указать шрифт. Параметры: *font* - указатель на шрифт. |
+| `void setCaptionOutlineThickness(int size)` | Устанавливает размер обводки шрифта надписи. Параметры: *size* - размер в пикселях. если указать отрицательное значение, то обводка станет внутреней. |
+| `void setCaptionStyle(sf::Uint32 style)` | Устанавливает стиль шрфита надписи. Параметры: *style* - сочетание стилей (стиля). |
+| `void setVisibility(bool visibility)` | Установка видимости элемента. Параметры: *visibility* - видимость элемента. |
+| `void setPosition(sf::Vector2f position)` | Установка позиции элемента. Параметры: *position* - позиция элемента. |
+| `void setPosition(float x, float y)` | Установка позиции элемента. Параметры: *x* - позиция элемента по оси X; *x* - позиция элемента по оси Y. |
+| `void setSize(sf::Vector2f size)` | Установка размера элемента. Параметры: *size* - размер элемента; |
+| `void setSize(float width, float height)` | Установка размера элемента. Параметры: *width* - ширина элемента; *height* - высота элемента. |
+| `void setWindow(sf::RenderWindow window)` | Установка целевого окна элемента. Но стоит обратить внимание, что конструктор по умолчанию требует указать. Параметры: *window* - целевое окно. |
+
+#### CaptionButton
+
+Предназначен для создания кнопки с надписью и привязки процедур к ней.
+
+| Метод | Описание |
+|:-|:-|
+| `Label(RenderWindow &window, &font)` | Конструктор элемента. Параметры: *window* - окно, в котором будет отображаться элемент; *font* - шрфит надписи. |
+| `void display()` | Рисование элемента в целевом окне (для изменения окна используйте `setWindow(sf::RenderWindow window)`, но стоит обратить внимание, что конструктор по умолчанию требует указать целевое окно).|
+| `sf::String getCaption()` | Возвращает надпись. |
+| `int getCaptionCharacterSize()` | Возвращает размер шрифта. |
+| `float getCaptionOutlineThickness()` | Возвращает толщину обводки шрифта. |
+| `sf::Font getFont()` | Возвращает указатель на шрифт. Возвращает NULL, если шрифта нет. |
+| `sf::Vector2f getPosition()` | Возвращает позицию элемента. |
+| `sf::Vector2f getSize()` | Возвращает размер элемента. |
+| `sf::RenderWindow getWindow()` | Возвращает указатель на окно. Возвращает NULL, если шрифта нет. |
 | `bool isEnabled()` | Возвращает true, если элемент активен. false, если нет. |
 | `bool label.isVisible();` | Возвращает true, если элемент виден. false, если нет. |
-| `void setCaption(std::string caption)` | Устанавливает текст надписи. Параметры: *caption* - текст надписи или массив символов. |
-| `void setCaption(std::wstring caption)` | Устанавливает текст надписи. Параметры: *caption* - текст надписи или массив символов. |
+| `void setCaption(wstring text, Vector2f identication)` | Устанавливает текст надписи. Параметры: *text* - текст надписи или массив символов. *identication* - если установлен, то после изменения надписи будет вызван метод `void setSizeByCaption(identication)` |
+| `void setCaption(string text, Vector2f identication)` | Устанавливает текст надписи. Параметры: *text* - текст надписи или массив символов. *identication* - если установлен, то после изменения надписи будет вызван метод `void setSizeByCaption(identication)` |
 | `void setCaptionCharacterSize(int size)` | Устанавливает размер шрифта надписи. Параметры: *size* - размер в пикселях. |
 | `void setCaptionColor(sf::Color color)` | Устанавливает цвет шрифта надписи. Параметры: *color* - цвет надписи. |
 | `void setCaptionFont(sf::Font font)` | Устанавливает шрифт надписи. Но стоит обратить внимание, что конструктор по умолчанию требует указать шрифт. Параметры: *font* - указатель на шрифт. |
@@ -96,7 +140,38 @@ int main()
 | `void setSize(sf::Vector2f size)` | Установка размера элемента. Параметры: *size* - размер элемента; |
 | `void setSize(float width, float height)` | Установка размера элемента. Параметры: *width* - ширина элемента; *height* - высота элемента. |
 | `void setWindow(sf::RenderWindow window)` | Установка целевого окна элемента. Но стоит обратить внимание, что конструктор по умолчанию требует указать. Параметры: *window* - целевое окно. |
+| `void setSizeByCaption(Vector2f interval = Vector2f(5, 5))` | Изменяет размер тела кнопки в зависимости от размера надписи. Параметры: *interval* - отличие размера тела кнопки от надписи. |
+| `void setBackgroundColors(ActiveColor colors = ActiveColor(Color(225, 225, 225), Color(245, 245, 245), Color(190, 190, 190)))` | Устанавливает цвета тела кнопки. Параметры: *colors* - активные цвета тела кнопки. |
+| `void setBorderColors(ActiveColor colors = ActiveColor(Color(225, 225, 225), Color(245, 245, 245), Color(190, 190, 190)))` | Устанавливает цвета рамки кнопки. Параметры: *colors* - активные цвета рамки кнопки. |
+| `void setTextColors(ActiveColor colors = ActiveColor(Color(225, 225, 225), Color(245, 245, 245), Color(190, 190, 190)))` | Устанавливает цвета текста кнопки. Параметры: *colors* - активные цвета текста кнопки. |
+| `ActiveColor getBackgroundColors()` | Возвращает цвета тела кнопки. |
+| `ActiveColor getBorderColors()` | Возвращает цвета рамки кнопки. |
+| `ActiveColor getTextColors()` | Возвращает цвета текста кнопки. |
+| `int getEvent(sf::Event &event)` | Обрабатывает события для кнопки. Возвращает код события `enum Event`. Параметры: *event* - событийный объект. |
+| `void(*onClick)() = NULL` | Указатель на процедуру, которая будет вызвана при нажатии на кнопку.  |
+| `void(*onHover)() = NULL` | Указатель на процедуру, которая будет вызвана при наведении на кнопку.  |
+| `void(*onHoverOut)() = NULL` | Указатель на процедуру, которая будет вызвана при выводе курсора за границы кнопки.  |
 
+События пренадлежащие CaptionButton.
+
+| Наименование | Событие |
+|:-|:-|
+| Nothing | Никакого события не произошло |
+| Clicked | Кнопка была нажата |
+
+#### CheckBox
+*Comming soon...*
+
+#### RadioButton
+*Comming soon...*
+
+#### RadioButtonContainer
+*Comming soon...*
+
+#### TextBox
+*Comming soon...*
+
+#### ProgressBar
 *Comming soon...*
 
 ## Пример использования
