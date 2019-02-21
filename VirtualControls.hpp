@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Base.hpp"
+#include "Base.h"
 
 using namespace sf;
 using namespace std;
@@ -10,7 +10,7 @@ class Label :
 	public Enable, 
 	public Visible, 
 	public Caption, 
-	public Click,
+	public PositionSize,
 	public RenderWindowElement
 {
 protected:
@@ -19,6 +19,16 @@ protected:
 	void caption_update()
 	{
 		size =  Vector2f(caption.getLocalBounds().width + caption.getLocalBounds().left, caption.getLocalBounds().height + caption.getLocalBounds().top);
+	}
+
+	void position_update()
+	{
+		caption.setPosition(position);
+	}
+	
+	void size_update()
+	{
+
 	}
 
 public:
@@ -35,20 +45,6 @@ public:
 		setPosition(position);
 		setCaptionCharacterSize(15);
 	}
-
-
-	void setPosition(Vector2f position)
-	{
-		this->position = position;
-
-		caption.setPosition(position);
-	}
-
-	void setPosition(float x, float y)
-	{
-		setPosition(Vector2f(x, y));
-	}
-
 
 	void display()
 	{
@@ -101,6 +97,23 @@ protected:
 	
 	}
 
+	void size_update()
+	{
+		background.setSize(size);
+
+		caption_update();
+		background_update();
+	}
+
+	void position_update()
+	{
+		caption.setPosition(position);
+		background.setPosition(position);
+
+		caption_update();
+		background_update();
+	}
+
 public:
 
 	CaptionButton(RenderWindow &window, Font &font)
@@ -122,20 +135,6 @@ public:
 	}
 	
 
-	void setSize(Vector2f size)
-	{
-		this->size = size;
-		background.setSize(size);
-
-		caption_update();
-	}
-
-	void setSize(float x, float y)
-	{
-		setSize(Vector2f(x, y));
-	}
-
-	
 	void setCaption(wstring text, bool size = false)
 	{
 		caption.setString(text);
@@ -158,20 +157,6 @@ public:
 		setSize((caption.getLocalBounds().width - caption.getLocalBounds().left) + interval.x * 2,
 			(caption.getLocalBounds().height + caption.getLocalBounds().top) + interval.y * 2);
 		caption_update();
-	}
-
-
-	void setPosition(Vector2f position)
-	{
-		this->position = position;
-
-		caption.setPosition(position);
-		background.setPosition(position);
-	}
-
-	void setPosition(float x, float y)
-	{
-		setPosition(Vector2f(x, y));
 	}
 
 
@@ -267,7 +252,8 @@ class CheckBox :
 	public Visible, 
 	public Caption, 
 	public Background,
-	public RenderWindowElement
+	public RenderWindowElement,
+	public Checked
 {
 protected:
 	VertexArray check;
@@ -276,7 +262,6 @@ protected:
 		check_color,
 		border_color;
 
-	bool checked = false;
 	int indentation = 2;
 
 	void Brush(Color bg_color, Color txt_color, Color brd_color, Color check_color)
@@ -304,13 +289,40 @@ protected:
 
 	}
 
+	void position_update()
+	{
+		check[0].position = Vector2f(position.x + indentation, position.y + size.y / 2);
+		check[1].position = Vector2f(position.x + indentation + 3, position.y + size.y / 2);
+		check[2].position = Vector2f(position.x + size.x / 2 + 1, position.y + size.y - indentation);
+		check[3].position = Vector2f(position.x + size.x / 2 - 2, position.y + size.y - indentation);
+
+		check[4].position = Vector2f(position.x + size.x / 2 - 2, position.y + size.y - indentation);
+		check[5].position = Vector2f(position.x + size.x / 2 + 1, position.y + size.y - indentation);
+		check[6].position = Vector2f(position.x + size.x - indentation, position.y + indentation);
+		check[7].position = Vector2f(position.x + size.x - indentation - 3, position.y + indentation);
+
+		caption.setPosition(position);
+		background.setPosition(position);
+
+		background_update();
+		caption_update();
+	}
+
+	void size_update()
+	{
+		background.setSize(size);
+
+		background_update();
+		caption_update();
+	}
+
 public:
 
 	CheckBox(RenderWindow &window, Font &font)
 	{
 		setCaptionFont(font);
 		this->window = &window;
-		checked = false;
+		is_checked = false;
 
 		check = VertexArray(sf::Quads, 8);
 		size = Vector2f(15, 15);
@@ -335,43 +347,6 @@ public:
 		else
 			caption.setCharacterSize(size);
 		caption_update();
-	}
-
-
-	void setPosition(Vector2f position)
-	{
-		this->position = position;
-
-		check[0].position = Vector2f(position.x + indentation, position.y + size.y / 2);
-		check[1].position = Vector2f(position.x + indentation + 3, position.y + size.y / 2);
-		check[2].position = Vector2f(position.x + size.x / 2 + 1, position.y + size.y - indentation);
-		check[3].position = Vector2f(position.x + size.x / 2 - 2, position.y + size.y - indentation);
-
-		check[4].position = Vector2f(position.x + size.x / 2 - 2, position.y + size.y - indentation);
-		check[5].position = Vector2f(position.x + size.x / 2 + 1, position.y + size.y - indentation);
-		check[6].position = Vector2f(position.x + size.x - indentation, position.y + indentation);
-		check[7].position = Vector2f(position.x + size.x - indentation - 3, position.y + indentation);
-
-		caption.setPosition(position);
-		background.setPosition(position);
-	}
-
-	void setPosition(float position_x, float position_y)
-	{
-		setPosition(Vector2f(position_x, position_y));
-	}
-
-
-	void setSize(Vector2f size)
-	{
-		this->position = position;
-
-		background.setSize(size);
-	}
-
-	void setSize(float size_x, float size_y)
-	{
-		setSize(Vector2f(size_x, size_y));
 	}
 
 
@@ -433,18 +408,6 @@ public:
 		check_color.clicked = ck_color;
 	}
 
-
-	bool isChecked()
-	{
-		return checked;
-	}
-
-	void setState(bool checked)
-	{
-		this->checked = checked;
-	}
-
-
 	void setIndentationImg(int indentation)
 	{
 		this->indentation = indentation;
@@ -457,7 +420,7 @@ public:
 			return;
 
 		window->draw(background);
-		if (checked) window->draw(check);
+		if (is_checked) window->draw(check);
 		window->draw(caption);
 	}
 
@@ -481,16 +444,16 @@ public:
 
 		if (ClickedOn(event, mouse))
 		{
-			checked = !checked;
-			if (checked)
+			is_checked = !is_checked;
+			if (is_checked)
 			{
-				if (onChecked) onChecked();
 				return Event::Checked;
+				if (onChecked) onChecked();
 			}
 			else 
 			{
-				if (onUnchecked) onUnchecked();
 				return Event::Unchecked;
+				if (onUnchecked) onUnchecked();
 			}
 		}
 
@@ -551,6 +514,24 @@ protected:
 			caption.setOrigin(-(size.x + 5), 0);
 	}
 
+	void position_update()
+	{
+		check.setPosition(position);
+		background.setPosition(position);
+		caption.setPosition(position);
+
+		caption_update();
+	}
+
+	void size_update()
+	{
+		background.setRadius(size.x / 2);
+		check.setRadius(size.x / 2 - indentation * 2);
+		check.setOrigin(-(indentation * 2), -(indentation * 2));
+
+		caption_update();
+	}
+
 public:
 	RadioButton(RenderWindow &window, Font &font)
 	{
@@ -580,36 +561,6 @@ public:
 		else
 			caption.setCharacterSize(size);
 		setSize(this->size);
-	}
-
-
-	void setPosition(Vector2f position)
-	{
-		this->position = position;
-
-		check.setPosition(position);
-		background.setPosition(position);
-		caption.setPosition(position);
-	}
-
-	void setPosition(float position_x, float position_y)
-	{
-		setPosition(Vector2f(position_x, position_y));
-	}
-
-
-	void setSize(Vector2f size)
-	{
-		this->size = size;
-
-		background.setRadius(size.x/2);
-		check.setRadius(size.x / 2 - indentation * 2);
-		check.setOrigin(-(indentation * 2), -(indentation * 2));
-	}
-
-	void setSize(float size_x, float size_y)
-	{
-		setSize(Vector2f(size_x, size_y));
 	}
 
 
@@ -862,12 +813,29 @@ protected:
 		return text_.getLocalBounds();
 	}
 
+	void size_update()
+	{
+		wordspace_render.create((int)size.x, (int)size.y, true);
+		wordspace.setTexture(wordspace_render.getTexture(), true);
+		background.setSize(size);
+		
+		background_update();
+	}
+
+	void position_update()
+	{
+		wordspace.setPosition(position);
+		background.setPosition(position);
+
+		background_update();
+	}
+
 public:
 	TextBox(RenderWindow &window, Font &font)
 	{
-		setFont(font);
 		this->window = &window;
-		
+		setFont(font);
+
 		size = Vector2f(75, 25);
 		position = Vector2f(0, 0);
 
@@ -888,24 +856,6 @@ public:
 	}
 
 
-	void setSize(Vector2f size)
-	{
-		this->size = size;
-		
-		wordspace_render.create((int)size.x, (int)size.y, true);
-		wordspace.setTexture(wordspace_render.getTexture(), true);
-
-		background.setSize(size);
-
-		background_update();
-	}
-
-	void setSize(float size_x, float size_y)
-	{
-		setSize(Vector2f(size_x, size_y));
-	}	
-
-
 	void setSizeByCaption(Vector2f interval = Vector2f(5, 5))
 	{
 		wstring buf = text.getString().toWideString();
@@ -916,20 +866,6 @@ public:
 			(text.getLocalBounds().height + text.getLocalBounds().top) + interval.y * 2);
 
 		text.setString(buf);
-	}
-
-
-	void setPosition(Vector2f position)
-	{
-		this->position = position;
-
-		wordspace.setPosition(position);
-		background.setPosition(position);
-	}
-
-	void setPosition(float position_x, float position_y)
-	{
-		setPosition(Vector2f(position_x, position_y));
 	}
 
 
@@ -1033,6 +969,29 @@ public:
 			if (onHoverOut) onHoverOut();
 			Brush(background_color.basic, text_color.basic, border_color.basic);
 		}
+
+		if (ClickedOn(event, mouse))
+		{
+			if (onClick) onClick();
+
+			is_typing = true;
+			frames = 1;
+
+			return Event::Clicked;
+		}
+
+		if (ClickedOut(event, mouse))
+		{
+			is_typing = false;
+
+			identication = 0;
+			char_pos = 0;
+
+			text_cursor.setPosition(text.getPosition().x + cursor_identication.width + cursor_identication.left, text.getPosition().y);
+			text.setPosition(identication, text.getPosition().y);
+
+			return Event::Clicked_out;
+		}
 			
 		if (is_typing)
 		{
@@ -1070,7 +1029,8 @@ public:
 				}
 				frames = 1;
 
-				if (onTextChanged) onTextChanged();
+				if (onTextChanged) 
+					onTextChanged();
 			}
 
 			if (event.type == sf::Event::KeyPressed && event.key.code == Keyboard::Left)
@@ -1123,21 +1083,6 @@ public:
 			}
 		}
 
-		if (ClickedOn(event, mouse))
-		{
-			if (onClick) onClick();
-
-			is_typing = true;
-			frames = 1;
-
-			return Event::Clicked;
-		}
-
-		if (ClickedOut(event, mouse))
-		{
-			is_typing = false;
-		}
-
 		if (click_in)
 			Brush(background_color.clicked, text_color.clicked, border_color.clicked);
 
@@ -1148,6 +1093,7 @@ public:
 	{
 		Nothing = 0,
 		Clicked,
+		Clicked_out,
 		Returned
 	};
 
@@ -1160,7 +1106,8 @@ public:
 
 class ProgressBar:
 	public Enable,
-	public Click,
+
+	public PositionSize,
 	public Visible,
 	public Background,
 	public RenderWindowElement
@@ -1187,6 +1134,21 @@ protected:
 		progressed.setSize(Vector2f(one_progress_step * value, size.y));
 	}
 
+	void position_update()
+	{
+		background.setPosition(position);
+		progressed.setPosition(position);
+
+		background_update();
+	}
+
+	void size_update()
+	{
+		background.setSize(size);
+
+		background_update();
+	}
+
 public:
 
 	ProgressBar(RenderWindow &window)
@@ -1200,40 +1162,9 @@ public:
 	}
 	
 
-	void setSize(Vector2f size)
-	{
-		this->size = size;
-
-		background.setSize(size);
-		
-		background_update();
-	}
-
-	void setSize(float x, float y)
-	{
-		setSize(Vector2f(x, y));
-	}
-
-
 	void setBasicColors(Color bg_color = Color(225, 225, 225), Color prg_color = Color::Green, Color brd_color = Color::Black)
 	{
 		Brush(bg_color, prg_color, brd_color);
-	}
-
-
-	void setPosition(Vector2f position)
-	{
-		this->position = position;
-		
-		background.setPosition(position);
-		progressed.setPosition(position);
-
-		background_update();
-	}
-
-	void setPosition(float x, float y)
-	{
-		setPosition(Vector2f(x, y));
 	}
 
 
@@ -1264,3 +1195,20 @@ public:
 
 	friend class VirtualWindow;
 };
+
+
+void horizontalStack(PositionSize &element_1, PositionSize &element_2, float interval, bool get_Y = false)
+{
+	if (!get_Y)
+		element_2.setPosition(element_1.getPosition().x + element_1.getSize().x + interval, element_2.getPosition().y);
+	else
+		element_2.setPosition(element_1.getPosition().x + element_1.getSize().x + interval, element_1.getPosition().y);
+}
+
+void verticalStack(PositionSize &element_1, PositionSize &element_2, float interval, bool get_X = false)
+{
+	if (!get_X)
+		element_2.setPosition(element_2.getPosition().x, element_1.getPosition().y + element_1.getSize().y + interval);
+	else
+		element_2.setPosition(element_1.getPosition().x, element_1.getPosition().y + element_1.getSize().y + interval);
+}

@@ -3,51 +3,52 @@
 #include <SFML\Graphics.hpp>
 #include <iostream>
 #include <list>
-#include <Windows.h>
 
 using namespace sf;
 using namespace std;
 
-
 #define Watch(param) cout << #param << " = " << param << endl;
 
-class Position
+class PositionSize
 {
 protected:
-	Vector2f position, position_limit;
+	Vector2f position,
+		size;
+
+	virtual void position_update() = 0;
+
+	virtual void size_update() = 0;
+	
 
 public:
 	virtual void setPosition(Vector2f position)
 	{
 		this->position = position;
+
+		position_update();
 	}
 
 	void setPosition(float position_x, float position_y)
 	{
-		this->position = Vector2f(position_x, position_y);
+		setPosition(Vector2f(position_x, position_y));
 	}
-
 
 	virtual Vector2f getPosition()
 	{
 		return this->position;
 	}
-};
 
-class Size
-{
-protected:
-	Vector2f size;
 
-public:
 	virtual void setSize(Vector2f size)
 	{
 		this->size = size;
+
+		size_update();
 	}
 
 	virtual void setSize(float size_x, float size_y)
 	{
-		this->size = Vector2f(size_x, size_y);
+		setSize(Vector2f(size_x, size_y));
 	}
 
 	virtual Vector2f getSize()
@@ -56,7 +57,7 @@ public:
 	}
 };
 
-class IsIn : public Position, public Size
+class IsIn : public PositionSize
 {
 protected:
 	Vector2f* window_position;
@@ -146,9 +147,14 @@ public:
 		return is_checked;
 	}
 
-	void setState(bool is_checked)
+	void checked()
 	{
-		this->is_checked = is_checked;
+		this->is_checked = true;
+	}
+
+	void unchecked()
+	{
+		this->is_checked = false;
 	}
 
 	friend class RadioButtonContainer;
