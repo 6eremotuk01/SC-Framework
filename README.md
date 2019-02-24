@@ -121,7 +121,7 @@ int main()
 
 **Вид:**
 
-![Вид CaptionButton](img/CuptionButton.png)
+![Вид CaptionButton](img/CaptionButton.png)
 
 | Метод | Описание |
 |:-|:-|
