@@ -83,6 +83,10 @@ int main()
 #### Label
 Предназначен для вывода текста.
 
+**Вид:**
+
+![Вид Label](img/Label.png)
+
 | Метод | Описание |
 |:-|:-|
 | `Label(RenderWindow &window, &font)` | Конструктор элемента. Параметры: *window* - окно, в котором будет отображаться элемент; *font* - шрфит надписи. |
@@ -114,6 +118,10 @@ int main()
 #### CaptionButton
 
 Предназначен для создания кнопки с надписью и привязки процедур к ней.
+
+**Вид:**
+
+![Вид CaptionButton](img/CuptionButton.png)
 
 | Метод | Описание |
 |:-|:-|
@@ -163,6 +171,10 @@ int main()
 
 #### CheckBox
 Предназначен для создания переключателя, имеющего два состояния `Checked` и `Unchecked`.
+
+**Вид:**
+
+![Вид CheckBox](img/CheckBox.png)
 
 | Метод | Описание |
 |:-|:-|
@@ -219,6 +231,10 @@ int main()
 
 #### RadioButton
 Элемент схож с CheckBox (предназначен для создания переключателя, имеющего два состояния `Checked` и `Unchecked`), но зависит от других элементов, находящихся в контенере `RadioButtonContainer`. А именно только один переключатель может быть включен в данном контейнере.
+
+**Вид:**
+
+![Вид RadioButtom](img/RadioButton.png)
 
 | Метод | Описание |
 |:-|:-|
@@ -283,6 +299,10 @@ int main()
 | `void display()` | Рисование всех добавленных элементов в контейнер. Прорисовка элементов происходит в тех окнах, которые указаны у элементов `RadioButton`. |
 
 #### TextBox
+**Вид:**
+
+![Вид TextBox](img/TextBox.png)
+
 *Comming soon...*
 
 #### ProgressBar
@@ -348,4 +368,4 @@ int main()
 ```
 **Вывод**:
 
-![](https://raw.githubusercontent.com/6eremotuk01/SCL-library/master/screenshot.png "Полная версия сайта")
+![Результат работы программы](img/screenshot.png)

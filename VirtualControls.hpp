@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Base.h"
+#include "Base.hpp"
 
 using namespace sf;
 using namespace std;
@@ -1197,7 +1197,7 @@ public:
 };
 
 
-void horizontalStack(PositionSize &element_1, PositionSize &element_2, float interval, bool get_Y = false)
+void horizontalStack(PositionSize &element_1, PositionSize &element_2, float interval = 5.0, bool get_Y = false)
 {
 	if (!get_Y)
 		element_2.setPosition(element_1.getPosition().x + element_1.getSize().x + interval, element_2.getPosition().y);
@@ -1205,7 +1205,7 @@ void horizontalStack(PositionSize &element_1, PositionSize &element_2, float int
 		element_2.setPosition(element_1.getPosition().x + element_1.getSize().x + interval, element_1.getPosition().y);
 }
 
-void verticalStack(PositionSize &element_1, PositionSize &element_2, float interval, bool get_X = false)
+void verticalStack(PositionSize &element_1, PositionSize &element_2, float interval = 5.0, bool get_X = false)
 {
 	if (!get_X)
 		element_2.setPosition(element_2.getPosition().x, element_1.getPosition().y + element_1.getSize().y + interval);
