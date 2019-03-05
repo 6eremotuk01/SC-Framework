@@ -77,7 +77,7 @@ protected:
 		background.setOutlineColor(brd_color);
 	}
 
-	void caption_update()
+	virtual void caption_update()
 	{
 		float size_x = 0, size_y = 0;
 
@@ -92,12 +92,12 @@ protected:
 			caption.setOrigin(0, 0);
 	}
 
-	void background_update() 
+	virtual void background_update()
 	{
 	
 	}
 
-	void size_update()
+	virtual void size_update()
 	{
 		background.setSize(size);
 
@@ -105,7 +105,7 @@ protected:
 		background_update();
 	}
 
-	void position_update()
+	virtual void position_update()
 	{
 		caption.setPosition(position);
 		background.setPosition(position);
@@ -1184,7 +1184,7 @@ public:
 	}
 
 
-	void display()
+	virtual void display()
 	{
 		if (!is_visible)
 			return;
@@ -1194,6 +1194,160 @@ public:
 	}
 
 	friend class VirtualWindow;
+};
+
+class ElementTextures 
+{
+protected:
+	vector<sf::Texture> textures;
+	string texture_path;
+
+public:
+	ElementTextures(string texture_path)
+	{
+		textures = vector<sf::Texture>(9);
+		this->texture_path = texture_path;
+	}
+
+	void setRects(vector<IntRect> corners, vector<IntRect> frames, IntRect background)
+	{
+		textures[0].loadFromFile(texture_path, corners[0]);
+		textures[1].loadFromFile(texture_path, corners[1]);
+		textures[2].loadFromFile(texture_path, corners[2]);
+		textures[3].loadFromFile(texture_path, corners[3]);
+
+		textures[4].loadFromFile(texture_path, frames[0]);
+		textures[5].loadFromFile(texture_path, frames[1]);
+		textures[6].loadFromFile(texture_path, frames[2]);
+		textures[7].loadFromFile(texture_path, frames[3]);
+
+		textures[8].loadFromFile(texture_path, background);
+	}
+
+	void setRepeated(bool rep = true)
+	{
+		for (auto elem : textures)
+			elem.setRepeated(rep);
+	}
+
+	Texture &operator[] (int index)
+	{
+		return textures[index];
+	}
+
+	friend class Textured;
+};
+
+class TextureCaptionButton : public CaptionButton, public Textured
+{
+protected:
+	Sprite corner_lt, corner_rt, corner_rb, corner_lb,
+		frame_l, frame_t, frame_r, frame_b,
+		background;
+
+	void size_update()
+	{
+		IntRect corner_size = corner_lt.getTextureRect();
+
+		corner_lt.setTextureRect(IntRect(0, 0, corner_size.width, corner_size.height));
+		corner_rt.setTextureRect(IntRect(0, 0, corner_size.width, corner_size.height));
+		corner_rb.setTextureRect(IntRect(0, 0, corner_size.width, corner_size.height));
+		corner_lb.setTextureRect(IntRect(0, 0, corner_size.width, corner_size.height));
+
+		frame_l.setTextureRect(IntRect(0, 0, corner_size.width, size.y - corner_size.height * 2));
+		frame_r.setTextureRect(IntRect(0, 0, corner_size.width, size.y - corner_size.height * 2));
+		frame_t.setTextureRect(IntRect(0, 0, size.x - corner_size.width * 2, corner_size.height));
+		frame_b.setTextureRect(IntRect(0, 0, size.x - corner_size.width * 2, corner_size.height));
+
+		background.setTextureRect(IntRect(0, 0,size.x - corner_size.width * 2, size.y - corner_size.height * 2));
+
+		corner_lt.setOrigin(0, 0);
+		corner_rt.setOrigin(-corner_size.width - frame_t.getTextureRect().width, 0);
+		corner_rb.setOrigin(-corner_size.width - frame_t.getTextureRect().width, -corner_size.width - frame_r.getTextureRect().height);
+		corner_lb.setOrigin(0, -corner_size.width - frame_r.getTextureRect().height);
+
+		frame_t.setOrigin(-corner_size.width, 0);
+		frame_r.setOrigin(corner_size.width - size.x, -corner_size.height);
+		frame_b.setOrigin(-corner_size.width, corner_size.height - size.y);
+		frame_l.setOrigin(0, -corner_size.height);
+
+		background.setOrigin(-corner_size.width, -corner_size.height);
+
+		caption_update();
+	}
+
+	void position_update()
+	{
+		corner_lt.setPosition(position);
+		corner_rt.setPosition(position);
+		corner_rb.setPosition(position);
+		corner_lb.setPosition(position);
+
+		frame_l.setPosition(position);
+		frame_t.setPosition(position);
+		frame_r.setPosition(position);
+		frame_b.setPosition(position);
+
+		background.setPosition(position);
+
+		caption.setPosition(position);
+	}
+
+public:
+	
+	TextureCaptionButton(RenderWindow &window, Font &font) : CaptionButton(window, font)
+	{
+	}
+
+	void setTexture(ElementTextures &texture)
+	{
+		corner_lt.setTexture(texture[0]);
+		corner_rt.setTexture(texture[1]);
+		corner_rb.setTexture(texture[2]);
+		corner_lb.setTexture(texture[3]);
+
+		frame_l.setTexture(texture[4]);
+		frame_t.setTexture(texture[5]);
+		frame_r.setTexture(texture[6]);
+		frame_b.setTexture(texture[7]);
+
+		background.setTexture(texture[8]);
+	}
+
+	void setTexture(vector<Texture> &texture)
+	{
+		corner_lt.setTexture(texture[0]);
+		corner_rt.setTexture(texture[1]);
+		corner_rb.setTexture(texture[2]);
+		corner_lb.setTexture(texture[3]);
+
+		frame_l.setTexture(texture[4]);
+		frame_t.setTexture(texture[5]);
+		frame_r.setTexture(texture[6]);
+		frame_b.setTexture(texture[7]);
+
+		background.setTexture(texture[8]);
+	}
+
+	void display()
+	{
+		if (!is_visible)
+			return;
+
+		window->draw(background);
+		
+		window->draw(frame_l);
+		window->draw(frame_t);
+		window->draw(frame_r);
+		window->draw(frame_b);
+		
+		window->draw(corner_lt);
+		window->draw(corner_rt);
+		window->draw(corner_rb);
+		window->draw(corner_lb);
+
+		window->draw(caption);
+	}
 };
 
 

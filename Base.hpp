@@ -355,3 +355,8 @@ protected:
 		return false;
 	}
 };
+
+class Textured
+{
+
+};
