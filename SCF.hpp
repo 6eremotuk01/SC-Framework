@@ -5,6 +5,9 @@
 using namespace sf;
 using namespace std;
 
+/*
+	Basics elements
+*/
 
 class Label : 
 	public Enable, 
@@ -217,7 +220,7 @@ public:
 		
 		Vector2f mouse = window->mapPixelToCoords(Mouse::getPosition(*window));
 
-		if (isIn(Mouse::getPosition(*window)))
+		if (isIn(mouse))
 			Brush(background_color.hovered, text_color.hovered, border_color.hovered);
 		else
 			Brush(background_color.basic, text_color.basic, border_color.basic);
@@ -1106,7 +1109,6 @@ public:
 
 class ProgressBar:
 	public Enable,
-
 	public PositionSize,
 	public Visible,
 	public Background,
@@ -1115,7 +1117,7 @@ class ProgressBar:
 protected:
 	RectangleShape progressed;
 	int value = 0;
-	int one_progress_step = 0;
+	float one_progress_step = 0;
 
 	Color background_color,
 		border_color,
@@ -1130,7 +1132,10 @@ protected:
 
 	void background_update() 
 	{
-		one_progress_step = size.x / 100;
+	}
+
+	void update()
+	{
 		progressed.setSize(Vector2f(one_progress_step * value, size.y));
 	}
 
@@ -1145,6 +1150,7 @@ protected:
 	void size_update()
 	{
 		background.setSize(size);
+		one_progress_step = size.x / 100;
 
 		background_update();
 	}
@@ -1168,14 +1174,14 @@ public:
 	}
 
 
-	void setValue(int value)
+	void setValue(int value_)
 	{
+		value = value_;
+
 		if (value > 100) value = 100;
 		if (value < 0) value = 0;
 
-		this->value = value;
-
-		background_update();
+		update();
 	}
 
 	int getValue()
@@ -1195,6 +1201,10 @@ public:
 
 	friend class VirtualWindow;
 };
+
+/*
+	Texture elements
+*/
 
 class ElementTextures 
 {
@@ -1241,54 +1251,116 @@ public:
 class TextureCaptionButton : public CaptionButton, public Textured
 {
 protected:
-	Sprite corner_lt, corner_rt, corner_rb, corner_lb,
-		frame_l, frame_t, frame_r, frame_b,
-		background;
+	Sprite corner_lt_basic, corner_rt_basic, corner_rb_basic, corner_lb_basic,
+		frame_l_basic, frame_t_basic, frame_r_basic, frame_b_basic,
+		background_basic;
+
+	Sprite corner_lt_hover, corner_rt_hover, corner_rb_hover, corner_lb_hover,
+		frame_l_hover, frame_t_hover, frame_r_hover, frame_b_hover,
+		background_hover;
+
+	Sprite corner_lt_click, corner_rt_click, corner_rb_click, corner_lb_click,
+		frame_l_click, frame_t_click, frame_r_click, frame_b_click,
+		background_click;
 
 	void size_update()
 	{
-		IntRect corner_size = corner_lt.getTextureRect();
+		IntRect corner_size = corner_lt_basic.getTextureRect();
 
-		corner_lt.setTextureRect(IntRect(0, 0, corner_size.width, corner_size.height));
-		corner_rt.setTextureRect(IntRect(0, 0, corner_size.width, corner_size.height));
-		corner_rb.setTextureRect(IntRect(0, 0, corner_size.width, corner_size.height));
-		corner_lb.setTextureRect(IntRect(0, 0, corner_size.width, corner_size.height));
+		corner_lt_basic.setTextureRect(IntRect(0, 0, corner_size.width, corner_size.height));
+		corner_rt_basic.setTextureRect(IntRect(0, 0, corner_size.width, corner_size.height));
+		corner_rb_basic.setTextureRect(IntRect(0, 0, corner_size.width, corner_size.height));
+		corner_lb_basic.setTextureRect(IntRect(0, 0, corner_size.width, corner_size.height));
+		frame_l_basic.setTextureRect(IntRect(0, 0, corner_size.width, size.y - corner_size.height * 2));
+		frame_r_basic.setTextureRect(IntRect(0, 0, corner_size.width, size.y - corner_size.height * 2));
+		frame_t_basic.setTextureRect(IntRect(0, 0, size.x - corner_size.width * 2, corner_size.height));
+		frame_b_basic.setTextureRect(IntRect(0, 0, size.x - corner_size.width * 2, corner_size.height));
+		background_basic.setTextureRect(IntRect(0, 0,size.x - corner_size.width * 2, size.y - corner_size.height * 2));
 
-		frame_l.setTextureRect(IntRect(0, 0, corner_size.width, size.y - corner_size.height * 2));
-		frame_r.setTextureRect(IntRect(0, 0, corner_size.width, size.y - corner_size.height * 2));
-		frame_t.setTextureRect(IntRect(0, 0, size.x - corner_size.width * 2, corner_size.height));
-		frame_b.setTextureRect(IntRect(0, 0, size.x - corner_size.width * 2, corner_size.height));
+		corner_lt_hover.setTextureRect(corner_lt_basic.getTextureRect());
+		corner_rt_hover.setTextureRect(corner_rt_basic.getTextureRect());
+		corner_rb_hover.setTextureRect(corner_rb_basic.getTextureRect());
+		corner_lb_hover.setTextureRect(corner_lb_basic.getTextureRect());
+		frame_l_hover.setTextureRect(frame_l_basic.getTextureRect());
+		frame_r_hover.setTextureRect(frame_r_basic.getTextureRect());
+		frame_t_hover.setTextureRect(frame_t_basic.getTextureRect());
+		frame_b_hover.setTextureRect(frame_b_basic.getTextureRect());
+		background_hover.setTextureRect(background_basic.getTextureRect());
 
-		background.setTextureRect(IntRect(0, 0,size.x - corner_size.width * 2, size.y - corner_size.height * 2));
+		corner_lt_click.setTextureRect(corner_lt_basic.getTextureRect());
+		corner_rt_click.setTextureRect(corner_rt_basic.getTextureRect());
+		corner_rb_click.setTextureRect(corner_rb_basic.getTextureRect());
+		corner_lb_click.setTextureRect(corner_lb_basic.getTextureRect());
+		frame_l_click.setTextureRect(frame_l_basic.getTextureRect());
+		frame_r_click.setTextureRect(frame_r_basic.getTextureRect());
+		frame_t_click.setTextureRect(frame_t_basic.getTextureRect());
+		frame_b_click.setTextureRect(frame_b_basic.getTextureRect());
+		background_click.setTextureRect(background_basic.getTextureRect());
 
-		corner_lt.setOrigin(0, 0);
-		corner_rt.setOrigin(-corner_size.width - frame_t.getTextureRect().width, 0);
-		corner_rb.setOrigin(-corner_size.width - frame_t.getTextureRect().width, -corner_size.width - frame_r.getTextureRect().height);
-		corner_lb.setOrigin(0, -corner_size.width - frame_r.getTextureRect().height);
+		corner_lt_basic.setOrigin(0, 0);
+		corner_rt_basic.setOrigin(-corner_size.width - frame_t_basic.getTextureRect().width, 0);
+		corner_rb_basic.setOrigin(-corner_size.width - frame_t_basic.getTextureRect().width, -corner_size.width - frame_r_basic.getTextureRect().height);
+		corner_lb_basic.setOrigin(0, -corner_size.width - frame_r_basic.getTextureRect().height);
+		frame_t_basic.setOrigin(-corner_size.width, 0);
+		frame_r_basic.setOrigin(corner_size.width - size.x, -corner_size.height);
+		frame_b_basic.setOrigin(-corner_size.width, corner_size.height - size.y);
+		frame_l_basic.setOrigin(0, -corner_size.height);
+		background_basic.setOrigin(-corner_size.width, -corner_size.height);
 
-		frame_t.setOrigin(-corner_size.width, 0);
-		frame_r.setOrigin(corner_size.width - size.x, -corner_size.height);
-		frame_b.setOrigin(-corner_size.width, corner_size.height - size.y);
-		frame_l.setOrigin(0, -corner_size.height);
+		corner_lt_hover.setOrigin(corner_lt_basic.getOrigin());
+		corner_rt_hover.setOrigin(corner_rt_basic.getOrigin());
+		corner_rb_hover.setOrigin(corner_rb_basic.getOrigin());
+		corner_lb_hover.setOrigin(corner_lb_basic.getOrigin());
+		frame_l_hover.setOrigin(frame_l_basic.getOrigin());
+		frame_r_hover.setOrigin(frame_r_basic.getOrigin());
+		frame_t_hover.setOrigin(frame_t_basic.getOrigin());
+		frame_b_hover.setOrigin(frame_b_basic.getOrigin());
+		background_hover.setOrigin(background_basic.getOrigin());
 
-		background.setOrigin(-corner_size.width, -corner_size.height);
+		corner_lt_click.setOrigin(corner_lt_basic.getOrigin());
+		corner_rt_click.setOrigin(corner_rt_basic.getOrigin());
+		corner_rb_click.setOrigin(corner_rb_basic.getOrigin());
+		corner_lb_click.setOrigin(corner_lb_basic.getOrigin());
+		frame_l_click.setOrigin(frame_l_basic.getOrigin());
+		frame_r_click.setOrigin(frame_r_basic.getOrigin());
+		frame_t_click.setOrigin(frame_t_basic.getOrigin());
+		frame_b_click.setOrigin(frame_b_basic.getOrigin());
+		background_click.setOrigin(background_basic.getOrigin());
 
 		caption_update();
 	}
 
 	void position_update()
 	{
-		corner_lt.setPosition(position);
-		corner_rt.setPosition(position);
-		corner_rb.setPosition(position);
-		corner_lb.setPosition(position);
+		corner_lt_basic.setPosition(position);
+		corner_rt_basic.setPosition(position);
+		corner_rb_basic.setPosition(position);
+		corner_lb_basic.setPosition(position);
+		frame_l_basic.setPosition(position);
+		frame_t_basic.setPosition(position);
+		frame_r_basic.setPosition(position);
+		frame_b_basic.setPosition(position);
+		background_basic.setPosition(position);
 
-		frame_l.setPosition(position);
-		frame_t.setPosition(position);
-		frame_r.setPosition(position);
-		frame_b.setPosition(position);
+		corner_lt_click.setPosition(position);
+		corner_rt_click.setPosition(position);
+		corner_rb_click.setPosition(position);
+		corner_lb_click.setPosition(position);
+		frame_l_click.setPosition(position);
+		frame_t_click.setPosition(position);
+		frame_r_click.setPosition(position);
+		frame_b_click.setPosition(position);
+		background_click.setPosition(position);
 
-		background.setPosition(position);
+		corner_lt_hover.setPosition(position);
+		corner_rt_hover.setPosition(position);
+		corner_rb_hover.setPosition(position);
+		corner_lb_hover.setPosition(position);
+		frame_l_hover.setPosition(position);
+		frame_t_hover.setPosition(position);
+		frame_r_hover.setPosition(position);
+		frame_b_hover.setPosition(position);
+		background_hover.setPosition(position);
 
 		caption.setPosition(position);
 	}
@@ -1299,57 +1371,148 @@ public:
 	{
 	}
 
-	void setTexture(ElementTextures &texture)
+
+	void setBasicTexture(ElementTextures &texture)
 	{
-		corner_lt.setTexture(texture[0]);
-		corner_rt.setTexture(texture[1]);
-		corner_rb.setTexture(texture[2]);
-		corner_lb.setTexture(texture[3]);
+		corner_lt_basic.setTexture(texture[0]);
+		corner_rt_basic.setTexture(texture[1]);
+		corner_rb_basic.setTexture(texture[2]);
+		corner_lb_basic.setTexture(texture[3]);
 
-		frame_l.setTexture(texture[4]);
-		frame_t.setTexture(texture[5]);
-		frame_r.setTexture(texture[6]);
-		frame_b.setTexture(texture[7]);
+		frame_l_basic.setTexture(texture[4]);
+		frame_t_basic.setTexture(texture[5]);
+		frame_r_basic.setTexture(texture[6]);
+		frame_b_basic.setTexture(texture[7]);
 
-		background.setTexture(texture[8]);
+		background_basic.setTexture(texture[8]);
 	}
 
-	void setTexture(vector<Texture> &texture)
+	void setBasicTexture(vector<Texture> &texture)
 	{
-		corner_lt.setTexture(texture[0]);
-		corner_rt.setTexture(texture[1]);
-		corner_rb.setTexture(texture[2]);
-		corner_lb.setTexture(texture[3]);
+		corner_lt_basic.setTexture(texture[0]);
+		corner_rt_basic.setTexture(texture[1]);
+		corner_rb_basic.setTexture(texture[2]);
+		corner_lb_basic.setTexture(texture[3]);
 
-		frame_l.setTexture(texture[4]);
-		frame_t.setTexture(texture[5]);
-		frame_r.setTexture(texture[6]);
-		frame_b.setTexture(texture[7]);
+		frame_l_basic.setTexture(texture[4]);
+		frame_t_basic.setTexture(texture[5]);
+		frame_r_basic.setTexture(texture[6]);
+		frame_b_basic.setTexture(texture[7]);
 
-		background.setTexture(texture[8]);
+		background_basic.setTexture(texture[8]);
 	}
+
+	void setHoverTexture(ElementTextures &texture)
+	{
+		corner_lt_hover.setTexture(texture[0]);
+		corner_rt_hover.setTexture(texture[1]);
+		corner_rb_hover.setTexture(texture[2]);
+		corner_lb_hover.setTexture(texture[3]);
+
+		frame_l_hover.setTexture(texture[4]);
+		frame_t_hover.setTexture(texture[5]);
+		frame_r_hover.setTexture(texture[6]);
+		frame_b_hover.setTexture(texture[7]);
+
+		background_hover.setTexture(texture[8]);
+	}
+
+	void setHoverTexture(vector<Texture> &texture)
+	{
+		corner_lt_hover.setTexture(texture[0]);
+		corner_rt_hover.setTexture(texture[1]);
+		corner_rb_hover.setTexture(texture[2]);
+		corner_lb_hover.setTexture(texture[3]);
+
+		frame_l_hover.setTexture(texture[4]);
+		frame_t_hover.setTexture(texture[5]);
+		frame_r_hover.setTexture(texture[6]);
+		frame_b_hover.setTexture(texture[7]);
+
+		background_hover.setTexture(texture[8]);
+	}
+
+	void setClickTexture(ElementTextures &texture)
+	{
+		corner_lt_click.setTexture(texture[0]);
+		corner_rt_click.setTexture(texture[1]);
+		corner_rb_click.setTexture(texture[2]);
+		corner_lb_click.setTexture(texture[3]);
+
+		frame_l_click.setTexture(texture[4]);
+		frame_t_click.setTexture(texture[5]);
+		frame_r_click.setTexture(texture[6]);
+		frame_b_click.setTexture(texture[7]);
+
+		background_click.setTexture(texture[8]);
+	}
+
+	void setClickTexture(vector<Texture> &texture)
+	{
+		corner_lt_click.setTexture(texture[0]);
+		corner_rt_click.setTexture(texture[1]);
+		corner_rb_click.setTexture(texture[2]);
+		corner_lb_click.setTexture(texture[3]);
+
+		frame_l_click.setTexture(texture[4]);
+		frame_t_click.setTexture(texture[5]);
+		frame_r_click.setTexture(texture[6]);
+		frame_b_click.setTexture(texture[7]);
+
+		background_click.setTexture(texture[8]);
+	}
+
 
 	void display()
 	{
 		if (!is_visible)
 			return;
 
-		window->draw(background);
-		
-		window->draw(frame_l);
-		window->draw(frame_t);
-		window->draw(frame_r);
-		window->draw(frame_b);
-		
-		window->draw(corner_lt);
-		window->draw(corner_rt);
-		window->draw(corner_rb);
-		window->draw(corner_lb);
+		Vector2f mouse = window->mapPixelToCoords(Mouse::getPosition(*window));
+		if (click_in)
+		{
+			window->draw(background_click);
+			window->draw(frame_l_click);
+			window->draw(frame_t_click);
+			window->draw(frame_r_click);
+			window->draw(frame_b_click);
+			window->draw(corner_lt_click);
+			window->draw(corner_rt_click);
+			window->draw(corner_rb_click);
+			window->draw(corner_lb_click);
+		}
+		else if (isIn(mouse))
+		{
+			window->draw(background_hover);
+			window->draw(frame_l_hover);
+			window->draw(frame_t_hover);
+			window->draw(frame_r_hover);
+			window->draw(frame_b_hover);
+			window->draw(corner_lt_hover);
+			window->draw(corner_rt_hover);
+			window->draw(corner_rb_hover);
+			window->draw(corner_lb_hover);
+		}
+		else
+		{
+			window->draw(background_basic);
+			window->draw(frame_l_basic);
+			window->draw(frame_t_basic);
+			window->draw(frame_r_basic);
+			window->draw(frame_b_basic);
+			window->draw(corner_lt_basic);
+			window->draw(corner_rt_basic);
+			window->draw(corner_rb_basic);
+			window->draw(corner_lb_basic);
+		}
 
 		window->draw(caption);
 	}
 };
 
+/*
+	Positions functions
+*/
 
 void horizontalStack(PositionSize &element_1, PositionSize &element_2, float interval = 5.0, bool get_Y = false)
 {
@@ -1365,4 +1528,14 @@ void verticalStack(PositionSize &element_1, PositionSize &element_2, float inter
 		element_2.setPosition(element_2.getPosition().x, element_1.getPosition().y + element_1.getSize().y + interval);
 	else
 		element_2.setPosition(element_1.getPosition().x, element_1.getPosition().y + element_1.getSize().y + interval);
+}
+
+void horizontalCenter(PositionSize &element_1, PositionSize &element_2)
+{
+	element_2.setPosition(element_1.getPosition().x + (element_1.getSize().x - element_2.getSize().x) / 2, element_2.getPosition().y);
+}
+
+void verticalCenter(PositionSize &element_1, PositionSize &element_2)
+{
+	element_2.setPosition(element_2.getPosition().x, element_1.getPosition().y + (element_1.getSize().y - element_2.getSize().y) / 2);
 }
