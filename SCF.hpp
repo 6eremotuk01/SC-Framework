@@ -1,13 +1,377 @@
 #pragma once
 
-#include "Base.hpp"
+#include <iostream>
+#include <list>
+
+#include <SFML\Graphics.hpp>
 
 using namespace sf;
 using namespace std;
 
 /*
-	Basics elements
+	Basic classes
+
+	By using this classes you can make your own GUI element.
+	Documentation API: https://github.com/6eremotuk01/SC-Framework/blob/master/README.md
 */
+
+#pragma region Basic classes
+
+class PositionSize
+{
+protected:
+	Vector2f position,
+		size;
+
+	virtual void position_update() = 0;
+
+	virtual void size_update() = 0;
+
+
+public:
+	virtual void setPosition(Vector2f position)
+	{
+		this->position = position;
+
+		position_update();
+	}
+
+	void setPosition(float position_x, float position_y)
+	{
+		setPosition(Vector2f(position_x, position_y));
+	}
+
+	virtual Vector2f getPosition()
+	{
+		return this->position;
+	}
+
+
+	virtual void setSize(Vector2f size)
+	{
+		this->size = size;
+
+		size_update();
+	}
+
+	virtual void setSize(float size_x, float size_y)
+	{
+		setSize(Vector2f(size_x, size_y));
+	}
+
+	virtual Vector2f getSize()
+	{
+		return this->size;
+	}
+};
+
+class IsIn : public PositionSize
+{
+public:
+	virtual bool isIn(Vector2f current_position)
+	{
+		if (position.x <= current_position.x &&
+			position.y <= current_position.y &&
+			position.x + size.x >= current_position.x &&
+			position.y + size.y >= current_position.y) return true;
+
+		return false;
+	}
+
+	virtual bool isIn(Vector2i current_position)
+	{
+		return isIn(Vector2f(current_position));
+	}
+};
+
+class Enable
+{
+protected:
+	bool is_enabled = true;
+
+public:
+	bool isEnabled()
+	{
+		return is_enabled;
+	}
+
+	void enable()
+	{
+		is_enabled = true;
+	}
+
+	void unable()
+	{
+		is_enabled = false;
+	}
+};
+
+class Visible
+{
+protected:
+	bool is_visible = true;
+
+public:
+	bool isVisible()
+	{
+		return is_visible;
+	}
+
+	void visible()
+	{
+		is_visible = true;
+	}
+
+	void invisible()
+	{
+		is_visible = false;
+	}
+};
+
+class Checked
+{
+protected:
+	bool is_checked = false;
+
+public:
+	bool isChecked()
+	{
+		return is_checked;
+	}
+
+	void checked()
+	{
+		this->is_checked = true;
+	}
+
+	void unchecked()
+	{
+		this->is_checked = false;
+	}
+
+	friend class RadioButtonContainer;
+};
+
+
+class ActiveColor
+{
+public:
+	Color hovered;
+	Color clicked;
+	Color basic;
+
+	ActiveColor()
+	{
+
+	}
+
+	ActiveColor(Color basic, Color clicked, Color hovered)
+	{
+		this->hovered = hovered;
+		this->clicked = clicked;
+		this->basic = basic;
+	}
+};
+
+class RenderWindowElement
+{
+protected:
+	RenderWindow* window = NULL;
+
+public:
+	RenderWindow* getWindow()
+	{
+		return window;
+	}
+
+	void setWindow(RenderWindow &window)
+	{
+		this->window = &window;
+	}
+};
+
+
+class Caption
+{
+protected:
+	Text caption;
+
+	virtual void caption_update() = 0;
+
+public:
+
+	void setCaption(wstring text)
+	{
+		caption.setString(text);
+
+		caption_update();
+	}
+
+	void setCaption(string text)
+	{
+		caption.setString(text);
+		caption_update();
+	}
+
+	String getCaption()
+	{
+		return caption.getString();
+	}
+
+
+	void setCaptionFont(Font &font)
+	{
+		caption.setFont(font);
+		caption_update();
+	}
+
+	const Font *getFont()
+	{
+		return caption.getFont();
+	}
+
+
+	void setCaptionStyle(Uint32 style)
+	{
+		caption.setStyle(style);
+		caption_update();
+	}
+
+
+	void setCaptionCharacterSize(unsigned int size)
+	{
+		caption.setCharacterSize(size);
+		caption_update();
+	}
+
+	unsigned int getCaptionCharacterSize()
+	{
+		return caption.getCharacterSize();
+	}
+
+
+	void setCaptionOutlineThickness(float size)
+	{
+		caption.setOutlineThickness(size);
+		caption_update();
+	}
+
+	float getCaptionOutlineThickness()
+	{
+		return caption.getOutlineThickness();
+	}
+
+
+	void setCaptionOutlineColor(Color color)
+	{
+		caption.setOutlineColor(color);
+		caption.getOutlineColor();
+	}
+
+	Color getCaptionOutlineColor()
+	{
+		return caption.getOutlineColor();
+	}
+
+
+	void setCaptionColor(Color color)
+	{
+		caption.setFillColor(color);
+	}
+};
+
+class Background
+{
+protected:
+	RectangleShape background;
+
+	virtual void background_update() = 0;
+
+public:
+
+	void setBorderSize(float size)
+	{
+		background.setOutlineThickness(size);
+		background_update();
+	}
+
+	void setBackgroundColor(Color color)
+	{
+		background.setFillColor(color);
+		background_update();
+	}
+};
+
+class Click : public IsIn
+{
+protected:
+	bool click_in = false;
+	bool click_out = false;
+
+	bool ClickedOn(sf::Event &event, Vector2f position_pointer)
+	{
+		if (click_in && event.type == sf::Event::MouseButtonReleased && event.key.code == Mouse::Left && isIn(position_pointer))
+		{
+			click_in = false;
+			return true;
+		}
+		if ((event.type == sf::Event::MouseButtonPressed && event.key.code == Mouse::Left && isIn(position_pointer)) || (click_in && isIn(position_pointer)))
+			click_in = true;
+		else
+			click_in = false;
+
+		return false;
+	}
+
+	bool ClickedOn(sf::Event &event, Vector2f position_pointer, bool condition)
+	{
+		if (click_in && event.type == sf::Event::MouseButtonReleased && event.key.code == Mouse::Left && condition)
+		{
+			click_in = false;
+			return true;
+		}
+		if ((event.type == sf::Event::MouseButtonPressed && event.key.code == Mouse::Left && condition) || (click_in && condition))
+			click_in = true;
+		else
+			click_in = false;
+
+		return false;
+	}
+
+	bool ClickedOut(sf::Event &event, Vector2f position_pointer)
+	{
+		if (click_out && event.type == sf::Event::MouseButtonReleased && event.key.code == Mouse::Left && !isIn(position_pointer))
+		{
+			click_out = false;
+			return true;
+		}
+		if ((event.type == sf::Event::MouseButtonPressed && event.key.code == Mouse::Left && !isIn(position_pointer)) || (click_out && !isIn(position_pointer)))
+			click_out = true;
+		else
+			click_out = false;
+
+		return false;
+	}
+};
+
+class Textured
+{
+
+};
+
+#pragma endregion
+
+
+/*
+	Basics elements
+
+	You can create GUI by using basic elements. For example you can create 
+	simple button by using CaptionButton element.
+
+	Documentation API: https://github.com/6eremotuk01/SC-Framework/blob/master/README.md#%D0%9E%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%BE%D0%B2-%D0%B8-%D0%BA%D0%BE%D0%BC%D0%BF%D0%BE%D0%BD%D0%B5%D0%BD%D1%82%D0%BE%D0%B2
+*/
+
+#pragma region Basic elements
 
 class Label : 
 	public Enable, 
@@ -138,20 +502,27 @@ public:
 	}
 	
 
-	void setCaption(wstring text, bool size = false)
+	void setCaption(wstring text, Vector2f interval)
 	{
 		caption.setString(text);
-
-		if (size)
-			setSizeByCaption();
+		setSizeByCaption(interval);
 	}
 
-	void setCaption(string text, bool size = false)
+	void setCaption(string text, Vector2f interval)
 	{
 		caption.setString(text);
+		setSizeByCaption(interval);
+	}
 
-		if (size)
-			setSizeByCaption();
+
+	void setCaption(wstring text)
+	{
+		caption.setString(text);
+	}
+
+	void setCaption(string text)
+	{
+		caption.setString(text);
 	}
 
 
@@ -221,9 +592,15 @@ public:
 		Vector2f mouse = window->mapPixelToCoords(Mouse::getPosition(*window));
 
 		if (isIn(mouse))
+		{
 			Brush(background_color.hovered, text_color.hovered, border_color.hovered);
+			if (onHover) onHover();
+		}
 		else
+		{
 			Brush(background_color.basic, text_color.basic, border_color.basic);
+			if (onHoverOut) onHoverOut();
+		}
 
 		if (ClickedOn(event, mouse))
 		{
@@ -319,6 +696,21 @@ protected:
 		caption_update();
 	}
 
+	bool isIn(Vector2f current_position)
+	{
+		if (position.x <= current_position.x &&
+			position.y <= current_position.y &&
+			position.x + size.x + caption.getLocalBounds().width + 5 >= current_position.x &&
+			position.y + size.y >= current_position.y) return true;
+
+		return false;
+	}
+
+	bool isIn(Vector2i current_position)
+	{
+		return isIn(Vector2f(current_position));
+	}
+
 public:
 
 	CheckBox(RenderWindow &window, Font &font)
@@ -336,14 +728,14 @@ public:
 		setClickedColors();
 
 		background.setOutlineThickness(-1);
-		setCharacterSize(15);
+		setCaptionCharacterSize(15);
 
 		setSize(size);
 		setPosition(position);
 	}
 
 
-	void setCharacterSize(int size = 0)
+	void setCaptionCharacterSize(int size = 0)
 	{
 		if (size == 0)
 			caption.setCharacterSize(this->size.y - 2);
@@ -356,32 +748,6 @@ public:
 	Vector2f getSize()
 	{
 		return Vector2f(size.x + caption.getLocalBounds().width + 5, size.y);
-	}
-
-
-	bool isIn(Vector2f current_position)
-	{
-		if (window_position)
-		{
-			if (window_position->x + position.x <= current_position.x &&
-				window_position->y + position.y <= current_position.y &&
-				window_position->x + position.x + size.x + caption.getLocalBounds().width + 5 >= current_position.x &&
-				window_position->y + position.y + size.y >= current_position.y) return true;
-		}
-		else
-		{
-			if (position.x <= current_position.x &&
-				position.y <= current_position.y &&
-				position.x + size.x + caption.getLocalBounds().width + 5 >= current_position.x &&
-				position.y + size.y >= current_position.y) return true;
-		}
-
-		return false;
-	}
-
-	bool isIn(Vector2i current_position)
-	{
-		return isIn(Vector2f(current_position));
 	}
 
 
@@ -410,6 +776,7 @@ public:
 		border_color.clicked = brd_color;
 		check_color.clicked = ck_color;
 	}
+
 
 	void setIndentationImg(int indentation)
 	{
@@ -535,6 +902,21 @@ protected:
 		caption_update();
 	}
 
+	bool isIn(Vector2f current_position)
+	{
+		if (position.x <= current_position.x &&
+			position.y <= current_position.y &&
+			position.x + size.x + caption.getLocalBounds().width + 5 >= current_position.x &&
+			position.y + size.y >= current_position.y) return true;
+
+		return false;
+	}
+
+	bool isIn(Vector2i current_position)
+	{
+		return isIn(Vector2f(current_position));
+	}
+
 public:
 	RadioButton(RenderWindow &window, Font &font)
 	{
@@ -550,14 +932,14 @@ public:
 		setClickedColors();
 
 		background.setOutlineThickness(-1);
-		setCharacterSize(15);
+		setCaptionCharacterSize(15);
 
 		setSize(size);
 		setPosition(position);
 	}
 
 
-	void setCharacterSize(float size = 0)
+	void setCaptionCharacterSize(float size = 0)
 	{
 		if (size == 0)
 			caption.setCharacterSize(this->size.y - 2);
@@ -570,32 +952,6 @@ public:
 	Vector2f getSize()
 	{
 		return Vector2f(size.x + caption.getLocalBounds().width + 5, size.y);
-	}
-
-
-	bool isIn(Vector2f current_position)
-	{
-		if (window_position)
-		{
-			if (window_position->x + position.x <= current_position.x &&
-				window_position->y + position.y <= current_position.y &&
-				window_position->x + position.x + size.x + caption.getLocalBounds().width + 5 >= current_position.x &&
-				window_position->y + position.y + size.y >= current_position.y) return true;
-		}
-		else
-		{
-			if (position.x <= current_position.x &&
-				position.y <= current_position.y &&
-				position.x + size.x + caption.getLocalBounds().width + 5 >= current_position.x &&
-				position.y + size.y >= current_position.y) return true;
-		}
-
-		return false;
-	}
-
-	bool isIn(Vector2i current_position)
-	{
-		return isIn(Vector2f(current_position));
 	}
 
 
@@ -834,6 +1190,7 @@ protected:
 	}
 
 public:
+
 	TextBox(RenderWindow &window, Font &font)
 	{
 		this->window = &window;
@@ -903,7 +1260,8 @@ public:
 		background_update();
 	}
 
-	void setCharacterSize(int size)
+
+	void setTextCharacterSize(unsigned int size)
 	{
 		text.setCharacterSize(size);
 		text_cursor.setSize(Vector2f(2, size * 1.2));
@@ -911,25 +1269,44 @@ public:
 		background_update();
 	}
 
+	unsigned int getTextCharacterSize()
+	{
+		return text.getCharacterSize();
+	}
 
-	void setText(string text, bool size = false)
+
+	void setText(string text, Vector2f interval)
 	{
 		this->text.setString(text);
 		this->result_text = wstring(text.begin(), text.end());
 
-		if (size)
-			setSizeByCaption();
+		setSizeByCaption(interval);
 
 		background_update();
 	}
 
-	void setText(wstring text, bool size = false)
+	void setText(wstring text, Vector2f interval)
 	{
 		this->text.setString(text);
 		this->result_text = text;
 
-		if (size)
-			setSizeByCaption();
+		setSizeByCaption(interval);
+
+		background_update();
+	}
+
+	void setText(string text)
+	{
+		this->text.setString(text);
+		this->result_text = wstring(text.begin(), text.end());
+
+		background_update();
+	}
+
+	void setText(wstring text)
+	{
+		this->text.setString(text);
+		this->result_text = text;
 
 		background_update();
 	}
@@ -966,6 +1343,7 @@ public:
 		{
 			if (onHover) onHover();
 			Brush(background_color.hovered, text_color.hovered, border_color.hovered);
+			return Event::Hovered;
 		}
 		else 
 		{
@@ -1095,6 +1473,7 @@ public:
 	enum Event
 	{
 		Nothing = 0,
+		Hovered,
 		Clicked,
 		Clicked_out,
 		Returned
@@ -1198,13 +1577,21 @@ public:
 		window->draw(background);
 		window->draw(progressed);
 	}
-
-	friend class VirtualWindow;
 };
 
+#pragma endregion
+
+
 /*
-	Texture elements
+	Textured elements
+
+	Also you can create basic GUI elements with your own design by using 
+	textured elements.
+
+	Documentation API: https://github.com/6eremotuk01/SC-Framework/blob/master/README.md#%D0%9E%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%BE%D0%B2-%D0%B8-%D0%BA%D0%BE%D0%BC%D0%BF%D0%BE%D0%BD%D0%B5%D0%BD%D1%82%D0%BE%D0%B2
 */
+
+#pragma region Textured elements
 
 class ElementTextures 
 {
@@ -1248,7 +1635,9 @@ public:
 	friend class Textured;
 };
 
-class TextureCaptionButton : public CaptionButton, public Textured
+class TextureCaptionButton : 
+	public CaptionButton, 
+	public Textured
 {
 protected:
 	Sprite corner_lt_basic, corner_rt_basic, corner_rb_basic, corner_lb_basic,
@@ -1510,9 +1899,19 @@ public:
 	}
 };
 
+#pragma endregion
+
+
 /*
 	Positions functions
+	
+	If you want to fast positioning your elements you can use this 
+	functions.
+
+	Documentation API: https://github.com/6eremotuk01/SC-Framework/blob/master/README.md#%D0%9E%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%BE%D0%B2-%D0%B8-%D0%BA%D0%BE%D0%BC%D0%BF%D0%BE%D0%BD%D0%B5%D0%BD%D1%82%D0%BE%D0%B2
 */
+
+#pragma region Position function
 
 void horizontalStack(PositionSize &element_1, PositionSize &element_2, float interval = 5.0, bool get_Y = false)
 {
@@ -1539,3 +1938,5 @@ void verticalCenter(PositionSize &element_1, PositionSize &element_2)
 {
 	element_2.setPosition(element_2.getPosition().x, element_1.getPosition().y + (element_1.getSize().y - element_2.getSize().y) / 2);
 }
+
+#pragma endregion
