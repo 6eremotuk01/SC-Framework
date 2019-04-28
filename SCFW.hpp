@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Base.hpp"
 #include "SCF.hpp"
 
 using namespace sf;
@@ -26,6 +25,9 @@ protected:
 	RectangleShape background;
 	
 	int indentation = 3;
+
+	void position_update() {}
+	void size_update() {}
 
 	void Brush(Color bg_color, Color color_cross, Color brd_color)
 	{
@@ -235,6 +237,8 @@ protected:
 		background.setOutlineColor(brd_color);
 	}
 
+	void position_update() {}
+	void size_update() {}
 
 public:
 	MaximizeButton()
@@ -491,7 +495,7 @@ public:
 };
 
 
-class VirtualWindow : public Size, public Position
+class VirtualWindow : public PositionSize
 {
 protected:
 	Text caption;
@@ -521,6 +525,9 @@ protected:
 		is_active = true,
 		is_open = false,
 		maximized = false;
+
+	void position_update() {}
+	void size_update() {}
 
 	bool isIn(Vector2f current_position)
 	{

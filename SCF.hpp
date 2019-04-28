@@ -67,13 +67,26 @@ public:
 
 class IsIn : public PositionSize
 {
+protected:
+	Vector2f* window_position;
+
 public:
 	virtual bool isIn(Vector2f current_position)
 	{
-		if (position.x <= current_position.x &&
-			position.y <= current_position.y &&
-			position.x + size.x >= current_position.x &&
-			position.y + size.y >= current_position.y) return true;
+		if (window_position)
+		{
+			if (window_position->x + position.x <= current_position.x &&
+				window_position->y + position.y <= current_position.y &&
+				window_position->x + position.x + size.x >= current_position.x &&
+				window_position->y + position.y + size.y >= current_position.y) return true;
+		}
+		else
+		{
+			if (position.x <= current_position.x &&
+				position.y <= current_position.y &&
+				position.x + size.x >= current_position.x &&
+				position.y + size.y >= current_position.y) return true;
+		}
 
 		return false;
 	}
@@ -81,6 +94,22 @@ public:
 	virtual bool isIn(Vector2i current_position)
 	{
 		return isIn(Vector2f(current_position));
+	}
+
+
+	virtual bool mouseIsIn(Vector2f current_position, sf::Event event)
+	{
+		if ((event.type == sf::Event::MouseMoved ||
+			event.type == sf::Event::MouseButtonPressed ||
+			event.type == sf::Event::MouseButtonReleased) &&
+			isIn(current_position)) return true;
+
+		return false;
+	}
+
+	virtual bool mouseIsIn(Vector2i current_position, sf::Event event)
+	{
+		return mouseIsIn(Vector2f(current_position), event);
 	}
 };
 
@@ -311,12 +340,12 @@ protected:
 
 	bool ClickedOn(sf::Event &event, Vector2f position_pointer)
 	{
-		if (click_in && event.type == sf::Event::MouseButtonReleased && event.key.code == Mouse::Left && isIn(position_pointer))
+		if (click_in && event.type == sf::Event::MouseButtonReleased && event.key.code == Mouse::Left && mouseIsIn(position_pointer, event))
 		{
 			click_in = false;
 			return true;
 		}
-		if ((event.type == sf::Event::MouseButtonPressed && event.key.code == Mouse::Left && isIn(position_pointer)) || (click_in && isIn(position_pointer)))
+		if ((event.type == sf::Event::MouseButtonPressed && event.key.code == Mouse::Left && mouseIsIn(position_pointer, event)) || (click_in && mouseIsIn(position_pointer, event)))
 			click_in = true;
 		else
 			click_in = false;
@@ -341,12 +370,12 @@ protected:
 
 	bool ClickedOut(sf::Event &event, Vector2f position_pointer)
 	{
-		if (click_out && event.type == sf::Event::MouseButtonReleased && event.key.code == Mouse::Left && !isIn(position_pointer))
+		if (click_out && event.type == sf::Event::MouseButtonReleased && event.key.code == Mouse::Left && !mouseIsIn(position_pointer, event))
 		{
 			click_out = false;
 			return true;
 		}
-		if ((event.type == sf::Event::MouseButtonPressed && event.key.code == Mouse::Left && !isIn(position_pointer)) || (click_out && !isIn(position_pointer)))
+		if ((event.type == sf::Event::MouseButtonPressed && event.key.code == Mouse::Left && !mouseIsIn(position_pointer, event)) || (click_out && !mouseIsIn(position_pointer, event)))
 			click_out = true;
 		else
 			click_out = false;
@@ -378,9 +407,10 @@ class Label :
 	public Enable, 
 	public Visible, 
 	public Caption, 
-	public PositionSize,
-	public RenderWindowElement
+	public RenderWindowElement,
+	public IsIn
 {
+	friend class VirtualWindow;
 protected:
 	bool click_in = false;
 
@@ -434,7 +464,9 @@ class CaptionButton :
 	public Caption, 
 	public Background,
 	public RenderWindowElement
+	
 {
+	friend class VirtualWindow;
 protected:
 	ActiveColor background_color,
 		text_color,
@@ -613,7 +645,7 @@ public:
 		
 		Vector2f mouse = window->mapPixelToCoords(Mouse::getPosition(*window));
 
-		if (isIn(mouse))
+		if (mouseIsIn(mouse, event))
 		{
 			Brush(background_color.hovered, text_color.hovered, border_color.hovered);
 			if (onHover) onHover(*this);
@@ -657,6 +689,7 @@ class CheckBox :
 	public RenderWindowElement,
 	public Checked
 {
+	friend class VirtualWindow;
 protected:
 	VertexArray check;
 	ActiveColor text_color,
@@ -824,7 +857,7 @@ public:
 
 		Vector2f mouse = window->mapPixelToCoords(Mouse::getPosition(*window));
 
-		if (isIn(Mouse::getPosition(*window)))
+		if (mouseIsIn(mouse, event))
 		{
 			if (onHover) onHover(*this);
 			Brush(background_color.hovered, text_color.hovered, border_color.hovered, check_color.hovered);
@@ -877,6 +910,7 @@ class RadioButton :
 	public Checked,
 	public RenderWindowElement
 {
+	friend class VirtualWindow;
 protected:
 	CircleShape background, 
 		check;
@@ -1034,7 +1068,7 @@ public:
 
 		Vector2f mouse = window->mapPixelToCoords(Mouse::getPosition(*window));
 
-		if (isIn(Mouse::getPosition(*window)))
+		if (mouseIsIn(mouse, event))
 		{
 			if (onHover) onHover(*this);
 			Brush(background_color.hovered, text_color.hovered, border_color.hovered, check_color.hovered);
@@ -1082,6 +1116,7 @@ public:
 
 class RadioButtonContainer
 {
+	friend class VirtualWindow;
 protected:
 	list <RadioButton*> radio_buttons;
 
@@ -1119,6 +1154,7 @@ class TextBox :
 	public Background,
 	public RenderWindowElement
 {
+	friend class VirtualWindow;
 protected:
 	RenderTexture wordspace_render;
 	Text text;
@@ -1363,7 +1399,7 @@ public:
 	{
 		Vector2f mouse = window->mapPixelToCoords(Mouse::getPosition(*window));
 
-		if (isIn(Mouse::getPosition(*window))) 
+		if (mouseIsIn(mouse, event))
 		{
 			if (onHover) onHover(*this);
 			Brush(background_color.hovered, text_color.hovered, border_color.hovered);
@@ -1517,6 +1553,7 @@ class ProgressBar:
 	public Background,
 	public RenderWindowElement
 {
+	friend class VirtualWindow;
 protected:
 	RectangleShape progressed;
 	int value = 0;
@@ -1600,183 +1637,6 @@ public:
 
 		window->draw(background);
 		window->draw(progressed);
-	}
-};
-
-class ComboBox :
-	public Enable,
-	public Click,
-	public RenderWindowElement,
-	public Visible,
-	public Background,
-	public Caption
-{
-protected:
-	ActiveColor background_color,
-		text_color,
-		border_color;
-
-	list<CaptionButton> items;
-	CaptionButton drop_button;
-
-	void Brush(Color bg_color, Color txt_color, Color brd_color)
-	{
-		background.setFillColor(bg_color);
-		caption.setFillColor(txt_color);
-		background.setOutlineColor(brd_color);
-	}
-
-	void background_update() 
-	{
-	
-	}
-
-	void position_update() 
-	{
-		background.setPosition(position);
-		caption.setPosition(position);
-
-		caption_update();
-		background_update();
-	}
-
-	void size_update() 
-	{
-		background.setSize(size);
-
-		caption_update();
-		background_update();
-	}
-
-	void caption_update() 
-	{
-		float size_x = 0, size_y = 0;
-
-		if (window)
-		{
-			window->draw(caption);
-			size_x = caption.getLocalBounds().width + caption.getLocalBounds().left * 2;
-			size_y = caption.getLocalBounds().height + caption.getLocalBounds().top * 2;
-			caption.setOrigin(-int(size.x / 2 - size_x / 2), -int(size.y / 2 - size_y / 2));
-		}
-		else
-			caption.setOrigin(0, 0);
-	}
-
-public:
-	
-	ComboBox(RenderWindow &window, Font &font)
-	{
-		this->window = &window;
-		setCaptionFont(font);
-
-		setBasicColors();
-		setHoveredColors();
-		setClickedColors();
-		setBorderSize(-2);
-
-		setSize(Vector2f(75, 35));
-		setPosition(Vector2f(0, 0));
-
-		setCaptionCharacterSize(15);
-
-		setCaption("ComboBox");
-	}
-
-
-	void setBasicColors(Color bg_color = Color(225, 225, 225), Color txt_color = Color::Black, Color brd_color = Color::Black)
-	{
-		background_color.basic = bg_color;
-		text_color.basic = txt_color;
-		border_color.basic = brd_color;
-
-		Brush(background_color.basic, text_color.basic, border_color.basic);
-	}
-
-	void setHoveredColors(Color bg_color = Color(245, 245, 245), Color txt_color = Color::Black, Color brd_color = Color(245, 245, 245))
-	{
-		background_color.hovered = bg_color;
-		text_color.hovered = txt_color;
-		border_color.hovered = brd_color;
-	}
-
-	void setClickedColors(Color bg_color = Color(190, 190, 190), Color txt_color = Color::Black, Color brd_color = Color(190, 190, 190))
-	{
-		background_color.clicked = bg_color;
-		text_color.clicked = txt_color;
-		border_color.clicked = brd_color;
-	}
-
-
-	ActiveColor getBackgroundColors()
-	{
-		return background_color;
-	}
-
-	ActiveColor getTextColors()
-	{
-		return background_color;
-	}
-
-	ActiveColor getBorderColors()
-	{
-		return background_color;
-	}
-
-
-	void setCaption(wstring text)
-	{
-		caption.setString(text);
-		caption_update();
-	}
-
-	void setCaption(string text)
-	{
-		caption.setString(text);
-		caption_update();
-	}
-
-
-	void setCaption(wstring text, Vector2f interval)
-	{
-		caption.setString(text);
-		caption_update();
-		setSizeByCaption(interval);
-		caption_update();
-	}
-
-	void setCaption(string text, Vector2f interval)
-	{
-		caption.setString(text);
-		caption_update();
-		setSizeByCaption(interval);
-		caption_update();
-	}
-
-
-	void setSizeByCaption(Vector2f interval = Vector2f(5, 5))
-	{
-		if (!window) {
-			cout << "Elemnt has no window!";
-			return;
-		}
-
-		window->draw(caption);
-
-		setSize((caption.getLocalBounds().width - caption.getLocalBounds().left) + interval.x * 2,
-			(caption.getLocalBounds().height + caption.getLocalBounds().top) + interval.y * 2);
-
-		caption_update();
-	}
-
-
-	void display()
-	{
-		if (!window) return;
-		if (!is_visible) return;
-
-		window->draw(background);
-		window->draw(caption);
 	}
 };
 
